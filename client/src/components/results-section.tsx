@@ -40,7 +40,7 @@ export default function ResultsSection() {
     }
   };
 
-  const recentDetections = detections.slice(0, 5);
+  const recentDetections = detections.slice(-10); // Mostrar as 10 mais recentes
   const totalDetections = detections.length;
   
   // Calculate risk counts from actual detections
