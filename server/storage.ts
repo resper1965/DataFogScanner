@@ -1,8 +1,9 @@
 import { 
-  users, files, detections, processingJobs,
+  users, files, detections, cases, processingJobs,
   type User, type InsertUser, 
   type File, type InsertFile,
   type Detection, type InsertDetection,
+  type Case, type InsertCase,
   type ProcessingJob, type InsertProcessingJob
 } from "@shared/schema";
 
@@ -23,6 +24,12 @@ export interface IStorage {
   getDetectionsByFileId(fileId: number): Promise<Detection[]>;
   getAllDetections(): Promise<Detection[]>;
   
+  // Cases
+  createCase(caseData: InsertCase): Promise<Case>;
+  getCase(id: number): Promise<Case | undefined>;
+  getCases(): Promise<Case[]>;
+  updateCase(id: number, updates: Partial<InsertCase>): Promise<void>;
+  
   // Processing Jobs
   createProcessingJob(job: InsertProcessingJob): Promise<ProcessingJob>;
   getProcessingJob(id: number): Promise<ProcessingJob | undefined>;
@@ -35,20 +42,24 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private files: Map<number, File>;
   private detections: Map<number, Detection>;
+  private cases: Map<number, Case>;
   private processingJobs: Map<number, ProcessingJob>;
   private currentUserId: number;
   private currentFileId: number;
   private currentDetectionId: number;
+  private currentCaseId: number;
   private currentJobId: number;
 
   constructor() {
     this.users = new Map();
     this.files = new Map();
     this.detections = new Map();
+    this.cases = new Map();
     this.processingJobs = new Map();
     this.currentUserId = 1;
     this.currentFileId = 1;
     this.currentDetectionId = 1;
+    this.currentCaseId = 1;
     this.currentJobId = 1;
   }
 
@@ -126,10 +137,43 @@ export class MemStorage implements IStorage {
     return Array.from(this.detections.values());
   }
 
+  async createCase(insertCase: InsertCase): Promise<Case> {
+    const id = this.currentCaseId++;
+    const case_: Case = { 
+      ...insertCase,
+      id,
+      createdAt: new Date(),
+      updatedAt: null
+    };
+    this.cases.set(id, case_);
+    return case_;
+  }
+
+  async getCase(id: number): Promise<Case | undefined> {
+    return this.cases.get(id);
+  }
+
+  async getCases(): Promise<Case[]> {
+    return Array.from(this.cases.values());
+  }
+
+  async updateCase(id: number, updates: Partial<InsertCase>): Promise<void> {
+    const existing = this.cases.get(id);
+    if (existing) {
+      const updated: Case = { 
+        ...existing, 
+        ...updates, 
+        updatedAt: new Date() 
+      };
+      this.cases.set(id, updated);
+    }
+  }
+
   async createProcessingJob(insertJob: InsertProcessingJob): Promise<ProcessingJob> {
     const id = this.currentJobId++;
     const job: ProcessingJob = { 
       ...insertJob,
+      caseId: insertJob.caseId || null,
       status: insertJob.status || "queued",
       progress: insertJob.progress || 0,
       patterns: insertJob.patterns || [],

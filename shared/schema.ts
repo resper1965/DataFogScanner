@@ -33,9 +33,21 @@ export const detections = pgTable("detections", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const cases = pgTable("cases", {
+  id: serial("id").primaryKey(),
+  clientName: text("client_name").notNull(),
+  incidentDate: timestamp("incident_date").notNull(),
+  incidentType: text("incident_type").notNull(),
+  description: text("description"),
+  observations: text("observations"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
 export const processingJobs = pgTable("processing_jobs", {
   id: serial("id").primaryKey(),
   fileId: integer("file_id").notNull().references(() => files.id),
+  caseId: integer("case_id").references(() => cases.id),
   status: text("status").notNull().default("queued"), // queued, processing, completed, failed
   progress: integer("progress").default(0),
   patterns: jsonb("patterns"),
@@ -62,6 +74,12 @@ export const insertDetectionSchema = createInsertSchema(detections).omit({
   createdAt: true,
 });
 
+export const insertCaseSchema = createInsertSchema(cases).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertProcessingJobSchema = createInsertSchema(processingJobs).omit({
   id: true,
   startedAt: true,
@@ -74,5 +92,7 @@ export type File = typeof files.$inferSelect;
 export type InsertFile = z.infer<typeof insertFileSchema>;
 export type Detection = typeof detections.$inferSelect;
 export type InsertDetection = z.infer<typeof insertDetectionSchema>;
+export type Case = typeof cases.$inferSelect;
+export type InsertCase = z.infer<typeof insertCaseSchema>;
 export type ProcessingJob = typeof processingJobs.$inferSelect;
 export type InsertProcessingJob = z.infer<typeof insertProcessingJobSchema>;
