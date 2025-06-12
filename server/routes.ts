@@ -344,7 +344,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cases", async (req, res) => {
     try {
-      const result = insertCaseSchema.safeParse(req.body);
+      // Parse the incident date from string to Date object
+      const bodyWithParsedDate = {
+        ...req.body,
+        incidentDate: new Date(req.body.incidentDate)
+      };
+      
+      const result = insertCaseSchema.safeParse(bodyWithParsedDate);
       if (!result.success) {
         return res.status(400).json({ error: "Invalid case data", details: result.error.issues });
       }
@@ -372,7 +378,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/cases/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const result = insertCaseSchema.partial().safeParse(req.body);
+      
+      // Parse the incident date from string to Date object if provided
+      const bodyWithParsedDate = {
+        ...req.body,
+        ...(req.body.incidentDate && { incidentDate: new Date(req.body.incidentDate) })
+      };
+      
+      const result = insertCaseSchema.partial().safeParse(bodyWithParsedDate);
       if (!result.success) {
         return res.status(400).json({ error: "Invalid case data", details: result.error.issues });
       }
