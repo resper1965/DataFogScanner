@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { CloudUpload, File, X, Search, Brain, Zap, Shield } from "lucide-react";
+import { CloudUpload, File, X, Search, Brain, Zap, Shield, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -91,6 +91,30 @@ export default function UploadSection() {
     },
   });
 
+  const clearFilesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/files", {});
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Arquivos removidos",
+        description: "Todos os arquivos e detecções foram limpos",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/files"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/detections"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/processing/jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/processing/stats"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao limpar arquivos",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setSelectedFiles(prev => [...prev, ...acceptedFiles]);
   }, []);
@@ -141,6 +165,19 @@ export default function UploadSection() {
       patterns: selectedPatterns,
       customRegex,
     });
+  };
+
+  const handleClearFiles = async () => {
+    if (uploadedFiles.length === 0) {
+      toast({
+        title: "Nenhum arquivo para limpar",
+        description: "Não há arquivos enviados",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    clearFilesMutation.mutate();
   };
 
   const togglePattern = (patternId: string) => {
@@ -308,26 +345,49 @@ export default function UploadSection() {
             />
           </div>
 
-          {/* Process Button */}
-          <Button 
-            onClick={handleStartProcessing}
-            disabled={uploadedFiles.length === 0 || processingMutation.isPending}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            <div className="flex items-center justify-center space-x-2">
-              {processingMutation.isPending ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  <span>Iniciando...</span>
-                </>
-              ) : (
-                <>
-                  {useSemanticAI ? <Brain className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
-                  <span>{useSemanticAI ? "Processar com IA" : "Processar com Regex"}</span>
-                </>
-              )}
-            </div>
-          </Button>
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button 
+              onClick={handleStartProcessing}
+              disabled={uploadedFiles.length === 0 || processingMutation.isPending}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              <div className="flex items-center justify-center space-x-2">
+                {processingMutation.isPending ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>Iniciando...</span>
+                  </>
+                ) : (
+                  <>
+                    {useSemanticAI ? <Brain className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
+                    <span>{useSemanticAI ? "Processar com IA" : "Processar com Regex"}</span>
+                  </>
+                )}
+              </div>
+            </Button>
+
+            <Button 
+              onClick={handleClearFiles}
+              disabled={uploadedFiles.length === 0 || clearFilesMutation.isPending}
+              variant="destructive"
+              className="w-full"
+            >
+              <div className="flex items-center justify-center space-x-2">
+                {clearFilesMutation.isPending ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>Limpando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    <span>Limpar Todos os Documentos</span>
+                  </>
+                )}
+              </div>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
