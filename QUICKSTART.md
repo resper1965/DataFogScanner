@@ -8,18 +8,10 @@
 ./setup-git.sh
 ```
 
-### 2. Criar Repositório no GitHub
-1. Acesse: https://github.com/new
-2. Nome: `datafog-pii-detector`
-3. Descrição: `Sistema avançado para detecção de PII em documentos brasileiros`
-4. Marque como **Público** ou **Privado**
-5. NÃO inicialize com README (já temos)
-6. Clique em **Create repository**
-
-### 3. Conectar e Enviar Código
+### 2. Conectar ao Seu Repositório
 ```bash
 # Adicionar remote origin
-git remote add origin https://github.com/SEU-USUARIO/datafog-pii-detector.git
+git remote add origin https://github.com/resper1965/PIIDetector.git
 
 # Enviar código
 git branch -M main
@@ -35,8 +27,8 @@ git push -u origin main
 ### Comandos de Deploy
 ```bash
 # 1. Clonar repositório na VPS
-git clone https://github.com/SEU-USUARIO/datafog-pii-detector.git
-cd datafog-pii-detector
+git clone https://github.com/resper1965/PIIDetector.git
+cd PIIDetector
 
 # 2. Executar deploy automatizado
 ./deploy.sh
