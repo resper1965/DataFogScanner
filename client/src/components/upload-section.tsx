@@ -25,10 +25,10 @@ export default function UploadSection() {
   const patterns = getBrazilianPatterns();
 
   // Query to get uploaded files
-  const { data: uploadedFiles = [] } = useQuery({
+  const { data: uploadedFiles = [] } = useQuery<any[]>({
     queryKey: ["/api/files"],
     refetchInterval: 2000,
-  }) as { data: any[] };
+  });
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
