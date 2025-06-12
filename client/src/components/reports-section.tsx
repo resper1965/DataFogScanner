@@ -75,7 +75,12 @@ export default function ReportsSection() {
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
 
-  // Fetch data
+  // Fetch data from dedicated statistics endpoint
+  const { data: statsData, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/reports/stats"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+  });
+
   const { data: detections = [] } = useQuery({
     queryKey: ["/api/detections"],
     queryFn: getQueryFn({ on401: "returnNull" }),
@@ -107,8 +112,10 @@ export default function ReportsSection() {
     return true;
   });
 
-  // Calculate statistics
-  const stats: DetectionStats = {
+  // Use server-side statistics when no filters are applied, otherwise calculate from filtered data
+  const hasFilters = Object.keys(filters).length > 0 || dateFrom || dateTo;
+  
+  const stats: DetectionStats = hasFilters ? {
     totalDetections: filteredDetections.length,
     byRiskLevel: filteredDetections.reduce((acc, d) => {
       acc[d.riskLevel] = (acc[d.riskLevel] || 0) + 1;
@@ -126,6 +133,24 @@ export default function ReportsSection() {
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
       .map(([pattern, count]) => ({ pattern, count }))
+  } : statsData ? {
+    totalDetections: statsData.totalDetections,
+    byRiskLevel: statsData.byRiskLevel || {},
+    byType: statsData.byType || {},
+    byDate: Object.entries(statsData.byDate || {}).map(([date, count]) => ({
+      date,
+      count: count as number
+    })).sort((a, b) => a.date.localeCompare(b.date)),
+    topPatterns: Object.entries(statsData.byType || {})
+      .map(([pattern, count]) => ({ pattern, count: count as number }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+  } : {
+    totalDetections: 0,
+    byRiskLevel: {},
+    byType: {},
+    byDate: [],
+    topPatterns: []
   };
 
   // Chart data
