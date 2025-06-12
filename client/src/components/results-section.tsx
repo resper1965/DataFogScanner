@@ -76,26 +76,28 @@ export default function ResultsSection() {
       const tableData = recentDetections.slice(0, 20).map((detection: any) => [
         format(new Date(detection.createdAt || ''), 'dd/MM/yyyy'),
         detection.type,
-        detection.value.length > 25 ? detection.value.substring(0, 25) + '...' : detection.value,
+        detection.value.length > 20 ? detection.value.substring(0, 20) + '...' : detection.value,
+        detection.ownerName || 'Não identificado',
         getRiskLevelText(detection.riskLevel),
-        detection.context && detection.context.length > 30 
-          ? detection.context.substring(0, 30) + '...' 
+        detection.context && detection.context.length > 25 
+          ? detection.context.substring(0, 25) + '...' 
           : detection.context || ''
       ]);
       
       autoTable(doc, {
-        head: [['Data', 'Tipo', 'Valor', 'Risco', 'Contexto']],
+        head: [['Data', 'Tipo', 'Valor', 'Titular', 'Risco', 'Contexto']],
         body: tableData,
         startY: yPos,
         theme: 'striped',
         headStyles: { fillColor: [41, 128, 185] },
         styles: { fontSize: 8, cellPadding: 2 },
         columnStyles: {
-          0: { cellWidth: 25 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 35 },
-          3: { cellWidth: 20 },
-          4: { cellWidth: 80 }
+          0: { cellWidth: 20 },
+          1: { cellWidth: 15 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 15 },
+          5: { cellWidth: 75 }
         }
       });
       
