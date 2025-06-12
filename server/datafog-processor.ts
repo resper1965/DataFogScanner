@@ -2,7 +2,6 @@ import { spawn } from "child_process";
 import { storage } from "./storage";
 import { extractZipFiles } from "./file-handler";
 import { getBrazilianPatterns } from "../client/src/lib/brazilian-patterns";
-import { semanticClassifier, type RegexCandidate } from "./semantic-classifier";
 import path from "path";
 import fs from "fs/promises";
 
@@ -122,6 +121,8 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
       await storage.updateFileStatus(job.fileId, 'error');
     }
   }
+}
+
 async function runRegexDetection(
   filePath: string, 
   patterns: any, 
@@ -131,41 +132,22 @@ async function runRegexDetection(
     // Read file content for processing
     const fileContent = await fs.readFile(filePath, 'utf-8');
     
-    // First, run regex-based detection
-    const regexResults = await runRegexDetection(fileContent, patterns, customRegex);
+    // Limit content size for processing
+    const contentToProcess = fileContent.length > MAX_CONTENT_LENGTH 
+      ? fileContent.substring(0, MAX_CONTENT_LENGTH) 
+      : fileContent;
     
-    // Convert regex results to RegexCandidate format
-    const regexCandidates: RegexCandidate[] = regexResults.map(result => ({
-      type: result.type,
-      value: result.value,
-      context: result.context,
-      position: result.position,
-      riskLevel: result.riskLevel
-    }));
-
-    // Apply semantic classification to improve accuracy
-    const semanticResults = await semanticClassifier.classifyText(fileContent, regexCandidates);
-    
-    // Convert semantic results back to DetectionResult format
-    return semanticResults.map(result => ({
-      type: result.type,
-      value: result.value,
-      context: result.context,
-      position: result.position,
-      riskLevel: result.riskLevel,
-      confidence: result.confidence,
-      source: result.source
-    }));
+    // Run Python DataFog script for pattern detection
+    const results = await runPythonDataFogScript(contentToProcess, patterns, customRegex);
+    return results;
 
   } catch (error) {
-    console.error('Erro no processamento híbrido:', error);
-    // Fallback to regex-only processing
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    return await runRegexDetection(fileContent, patterns, customRegex);
+    console.error('Erro no processamento de arquivo:', error);
+    return [];
   }
 }
 
-async function runRegexDetection(
+async function runPythonDataFogScript(
   content: string,
   patterns: any,
   customRegex?: string
@@ -177,76 +159,89 @@ async function runRegexDetection(
       
       const tempScriptPath = path.join(process.cwd(), 'temp_datafog_script.py');
       
-      fs.writeFile(tempScriptPath, scriptContent).then(() => {
-        const pythonProcess = spawn('python3', [tempScriptPath], {
-          stdio: ['pipe', 'pipe', 'pipe']
+      fs.writeFile(tempScriptPath, scriptContent)
+        .then(() => {
+          const pythonProcess = spawn('python3', [tempScriptPath], {
+            stdio: ['pipe', 'pipe', 'pipe']
+          });
+
+          let output = '';
+          let errorOutput = '';
+
+          pythonProcess.stdout.on('data', (data) => {
+            output += data.toString();
+          });
+
+          pythonProcess.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+          });
+
+          const timeout = setTimeout(() => {
+            pythonProcess.kill();
+            reject(new Error('Timeout no processamento Python'));
+          }, 20000);
+
+          pythonProcess.on('close', (code) => {
+            clearTimeout(timeout);
+            
+            // Clean up temp file
+            fs.unlink(tempScriptPath).catch(() => {});
+            
+            if (code !== 0) {
+              console.error('Erro no script Python:', errorOutput);
+              resolve([]);
+              return;
+            }
+
+            try {
+              const results = parseDataFogOutput(output);
+              resolve(results);
+            } catch (parseError) {
+              console.error('Erro ao parsear saída:', parseError);
+              resolve([]);
+            }
+          });
+
+          pythonProcess.on('error', (error) => {
+            clearTimeout(timeout);
+            console.error('Erro ao executar Python:', error);
+            resolve([]);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao criar script temporário:', error);
+          resolve([]);
         });
-
-        let stdout = '';
-        let stderr = '';
-
-        pythonProcess.stdout.on('data', (data) => {
-          stdout += data.toString();
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-          stderr += data.toString();
-        });
-
-        pythonProcess.on('close', async (code) => {
-          try {
-            await fs.unlink(tempScriptPath);
-          } catch (e) {
-            console.warn('Erro ao remover script temporário:', e);
-          }
-
-          if (code !== 0) {
-            reject(new Error(`DataFog process failed: ${stderr}`));
-            return;
-          }
-
-          try {
-            const results = parseDataFogOutput(stdout);
-            resolve(results);
-          } catch (error) {
-            reject(new Error(`Erro ao processar saída do DataFog: ${error}`));
-          }
-        });
-
-        pythonProcess.on('error', (error) => {
-          reject(new Error(`Erro ao executar Python: ${error.message}`));
-        });
-      }).catch(reject);
 
     } catch (error) {
-      reject(error);
+      console.error('Erro na configuração do script:', error);
+      resolve([]);
     }
   });
 }
 
 function createDataFogScript(
-  filePath: string, 
-  patterns: any, 
-  customRegex?: string,
-  brazilianPatterns?: any,
+  filePath: string,
+  patterns: string[],
+  customRegex: string | undefined,
+  brazilianPatterns: any[],
   content?: string
 ): string {
-  return `
-import json
+  return `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import re
 import sys
-import os
+import json
 
-# Mock DataFog functionality since the actual library might not be available
-class MockDataFog:
+class DataFogScanner:
     def __init__(self):
         self.patterns = {
             'cpf': r'\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b',
             'cnpj': r'\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b',
-            'cep': r'\\b\\d{5}-\\d{3}\\b',
-            'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b',
+            'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
             'telefone': r'\\b\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}\\b',
-            'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b'
+            'cep': r'\\b\\d{5}-?\\d{3}\\b',
+            'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b'
         }
         
     def scan_file(self, file_path, enabled_patterns, custom_regex=None):
@@ -319,10 +314,10 @@ def main():
     patterns = ${JSON.stringify(patterns || ['cpf', 'cnpj', 'email'])}
     custom_regex = ${customRegex ? `"${customRegex.replace(/"/g, '\\"')}"` : 'None'}
     
-    datafog = MockDataFog()
-    results = datafog.scan_file(file_path, patterns, custom_regex)
+    scanner = DataFogScanner()
+    results = scanner.scan_file(file_path, patterns, custom_regex)
     
-    print(json.dumps(results, ensure_ascii=False, indent=2))
+    print(json.dumps(results, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()
@@ -331,10 +326,20 @@ if __name__ == "__main__":
 
 function parseDataFogOutput(output: string): DetectionResult[] {
   try {
-    const results = JSON.parse(output);
-    return Array.isArray(results) ? results : [];
+    const lines = output.trim().split('\n');
+    const jsonLine = lines[lines.length - 1];
+    const results = JSON.parse(jsonLine);
+    
+    return results.map((result: any) => ({
+      type: result.type,
+      value: result.value,
+      context: result.context,
+      position: result.position,
+      riskLevel: result.riskLevel,
+      source: 'regex'
+    }));
   } catch (error) {
-    console.error('Erro ao fazer parse da saída:', error);
+    console.error('Erro ao parsear JSON:', error);
     return [];
   }
 }

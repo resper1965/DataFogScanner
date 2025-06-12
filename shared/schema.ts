@@ -46,8 +46,9 @@ export const processingJobs = pgTable("processing_jobs", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
+  email: true,
   password: true,
+  name: true,
 });
 
 export const insertFileSchema = createInsertSchema(files).omit({
