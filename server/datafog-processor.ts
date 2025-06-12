@@ -229,75 +229,146 @@ function createDataFogScript(
 ): string {
   return `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import re
 import sys
 import json
+from pathlib import Path
 
-class DataFogScanner:
-    def __init__(self):
-        self.patterns = {
-            'cpf': r'\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b',
-            'cnpj': r'\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b',
-            'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
-            'telefone': r'\\b\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}\\b',
-            'cep': r'\\b\\d{5}-?\\d{3}\\b',
-            'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b'
-        }
+try:
+    from datafog import DataFog
+    import PyPDF2
+    from docx import Document
+    import openpyxl
+except ImportError as e:
+    print(f"Erro ao importar bibliotecas: {e}", file=sys.stderr)
+    sys.exit(1)
+
+def extract_text_from_file(file_path):
+    """Extrai texto de diferentes tipos de arquivo"""
+    try:
+        file_extension = Path(file_path).suffix.lower()
         
-    def scan_file(self, file_path, enabled_patterns, custom_regex=None):
-        results = []
+        if file_extension == '.pdf':
+            return extract_text_from_pdf(file_path)
+        elif file_extension in ['.docx', '.doc']:
+            return extract_text_from_docx(file_path)
+        elif file_extension in ['.xlsx', '.xls']:
+            return extract_text_from_excel(file_path)
+        else:
+            # Arquivo de texto simples
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                return f.read()
+    except Exception as e:
+        print(f"Erro ao extrair texto de {file_path}: {e}", file=sys.stderr)
+        return ""
+
+def extract_text_from_pdf(file_path):
+    """Extrai texto de arquivo PDF"""
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text = ''
+            for page in pdf_reader.pages:
+                text += page.extract_text() + '\\n'
+            return text
+    except Exception as e:
+        print(f"Erro ao ler PDF: {e}", file=sys.stderr)
+        return ""
+
+def extract_text_from_docx(file_path):
+    """Extrai texto de arquivo DOCX"""
+    try:
+        doc = Document(file_path)
+        text = ''
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + '\\n'
+        return text
+    except Exception as e:
+        print(f"Erro ao ler DOCX: {e}", file=sys.stderr)
+        return ""
+
+def extract_text_from_excel(file_path):
+    """Extrai texto de arquivo Excel"""
+    try:
+        workbook = openpyxl.load_workbook(file_path)
+        text = ''
+        for sheet in workbook.worksheets:
+            for row in sheet.iter_rows():
+                for cell in row:
+                    if cell.value:
+                        text += str(cell.value) + ' '
+            text += '\\n'
+        return text
+    except Exception as e:
+        print(f"Erro ao ler Excel: {e}", file=sys.stderr)
+        return ""
+
+def scan_file_with_datafog(file_path, enabled_patterns):
+    """Usa o DataFog oficial para escanear o arquivo"""
+    results = []
+    
+    try:
+        # Extrair texto do arquivo
+        if file_path == 'temp_content':
+            content = """${content ? content.replace(/"/g, '\\"').replace(/\n/g, '\\n') : ''}"""
+        else:
+            content = extract_text_from_file(file_path)
         
-        try:
-            if file_path == 'temp_content':
-                content = """${content ? content.replace(/"/g, '\\"').replace(/\n/g, '\\n') : ''}"""
-            else:
-                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read()
-                
-            # Search for enabled patterns
+        if not content.strip():
+            print("Nenhum conteúdo extraído do arquivo", file=sys.stderr)
+            return results
+        
+        # Usar DataFog para escanear
+        datafog = DataFog()
+        
+        # Executar escaneamento
+        scan_results = datafog.scan(content)
+        
+        # Converter resultados para nosso formato
+        if hasattr(scan_results, 'matches') and scan_results.matches:
+            for match in scan_results.matches:
+                results.append({
+                    'type': getattr(match, 'entity_type', 'UNKNOWN').upper(),
+                    'value': getattr(match, 'text', ''),
+                    'context': getattr(match, 'context', content[max(0, getattr(match, 'start', 0)-20):getattr(match, 'end', 0)+20]),
+                    'position': getattr(match, 'start', 0),
+                    'riskLevel': 'high'
+                })
+        
+        # Se DataFog não encontrou nada, usar regex manual para padrões brasileiros
+        if not results:
+            import re
+            brazilian_patterns = {
+                'cpf': r'\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b',
+                'cnpj': r'\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b',
+                'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
+                'telefone': r'\\b\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}\\b',
+                'cep': r'\\b\\d{5}-?\\d{3}\\b',
+                'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b'
+            }
+            
             for pattern_name in enabled_patterns:
-                if pattern_name in self.patterns:
-                    matches = re.finditer(self.patterns[pattern_name], content, re.IGNORECASE)
+                if pattern_name in brazilian_patterns:
+                    matches = re.finditer(brazilian_patterns[pattern_name], content, re.IGNORECASE)
                     for match in matches:
-                        context_start = max(0, match.start() - 20)
-                        context_end = min(len(content), match.end() + 20)
+                        context_start = max(0, match.start() - 30)
+                        context_end = min(len(content), match.end() + 30)
                         context = content[context_start:context_end].strip()
-                        
-                        risk_level = self.get_risk_level(pattern_name)
                         
                         results.append({
                             'type': pattern_name.upper(),
                             'value': match.group(),
                             'context': context,
                             'position': match.start(),
-                            'riskLevel': risk_level
+                            'riskLevel': 'high'
                         })
-            
-            # Search custom regex if provided
-            if custom_regex:
-                try:
-                    matches = re.finditer(custom_regex, content, re.IGNORECASE)
-                    for match in matches:
-                        context_start = max(0, match.start() - 20)
-                        context_end = min(len(content), match.end() + 20)
-                        context = content[context_start:context_end].strip()
                         
-                        results.append({
-                            'type': 'CUSTOM',
-                            'value': match.group(),
-                            'context': context,
-                            'position': match.start(),
-                            'riskLevel': 'medium'
-                        })
-                except re.error as e:
-                    print(f"Erro no regex personalizado: {e}", file=sys.stderr)
-                    
-        except Exception as e:
-            print(f"Erro ao processar arquivo {file_path}: {e}", file=sys.stderr)
-            
-        return results
-    
-    def get_risk_level(self, pattern_type):
+    except Exception as e:
+        print(f"Erro ao processar arquivo {file_path}: {e}", file=sys.stderr)
+        
+    return results
+
+# Executar escaneamento
+def main():
         high_risk = ['cpf', 'cnpj', 'rg']
         medium_risk = ['telefone', 'cep']
         
