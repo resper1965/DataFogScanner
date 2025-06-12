@@ -13,6 +13,10 @@ const upload = multer({
   dest: 'uploads/',
   limits: {
     fileSize: 50 * 1024 * 1024 // 50MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Aceitar qualquer tipo de arquivo para processamento
+    cb(null, true);
   }
 });
 
@@ -94,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload files endpoint
-  app.post("/api/files/upload", upload.array('files', 10), async (req, res) => {
+  app.post("/api/files/upload", upload.any(), async (req, res) => {
     try {
       if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
