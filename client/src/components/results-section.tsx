@@ -279,6 +279,14 @@ export default function ResultsSection() {
               <Download className="mr-2 h-4 w-4" />
               Exportar CSV
             </Button>
+            <Button 
+              onClick={exportToPDF}
+              variant="outline" 
+              className="w-full"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Exportar PDF
+            </Button>
           </div>
         </CardContent>
       </Card>
