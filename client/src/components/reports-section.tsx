@@ -40,6 +40,10 @@ interface ReportFilters {
   detectionType?: string;
   caseId?: number;
   searchTerm?: string;
+  emailDomain?: string;
+  cpfPattern?: string;
+  cnpjPattern?: string;
+  contextSearch?: string;
 }
 
 interface DetectionStats {
@@ -101,6 +105,29 @@ export default function ReportsSection() {
     if (filters.riskLevel && filters.riskLevel !== 'all' && detection.riskLevel !== filters.riskLevel) return false;
     if (filters.detectionType && filters.detectionType !== 'all' && detection.type !== filters.detectionType) return false;
     if (filters.searchTerm && detection.context && !detection.context.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false;
+    
+    // Email domain filtering
+    if (filters.emailDomain && detection.type === 'EMAIL') {
+      const emailValue = detection.value;
+      const domain = emailValue.split('@')[1]?.toLowerCase();
+      const filterDomain = filters.emailDomain.toLowerCase().replace('@', '');
+      if (!domain || !domain.includes(filterDomain)) return false;
+    }
+    
+    // CPF pattern filtering
+    if (filters.cpfPattern && detection.type === 'CPF') {
+      if (!detection.value.includes(filters.cpfPattern)) return false;
+    }
+    
+    // CNPJ pattern filtering  
+    if (filters.cnpjPattern && detection.type === 'CNPJ') {
+      if (!detection.value.includes(filters.cnpjPattern)) return false;
+    }
+    
+    // Context search
+    if (filters.contextSearch && detection.context) {
+      if (!detection.context.toLowerCase().includes(filters.contextSearch.toLowerCase())) return false;
+    }
     
     // Date filtering
     if (dateFrom || dateTo) {
@@ -297,7 +324,7 @@ export default function ReportsSection() {
 
             {/* Search */}
             <div className="space-y-2">
-              <Label>Buscar</Label>
+              <Label>Buscar no Contexto</Label>
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -305,6 +332,63 @@ export default function ReportsSection() {
                   className="pl-8"
                   onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
                 />
+              </div>
+            </div>
+
+            {/* Advanced Filters */}
+            <div className="space-y-4 pt-4 border-t">
+              <Label className="text-sm font-medium text-muted-foreground">FILTROS AVANÇADOS</Label>
+              
+              {/* Email Domain Filter */}
+              <div className="space-y-2">
+                <Label>Domínio de Email</Label>
+                <Input
+                  placeholder="Ex: bradesco.com.br"
+                  onChange={(e) => setFilters(prev => ({ ...prev, emailDomain: e.target.value }))}
+                  value={filters.emailDomain || ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Filtra emails por domínio específico (sem @)
+                </p>
+              </div>
+
+              {/* CPF Pattern Filter */}
+              <div className="space-y-2">
+                <Label>Padrão CPF</Label>
+                <Input
+                  placeholder="Ex: 123.456"
+                  onChange={(e) => setFilters(prev => ({ ...prev, cpfPattern: e.target.value }))}
+                  value={filters.cpfPattern || ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Busca CPFs que contenham o padrão especificado
+                </p>
+              </div>
+
+              {/* CNPJ Pattern Filter */}
+              <div className="space-y-2">
+                <Label>Padrão CNPJ</Label>
+                <Input
+                  placeholder="Ex: 12.345"
+                  onChange={(e) => setFilters(prev => ({ ...prev, cnpjPattern: e.target.value }))}
+                  value={filters.cnpjPattern || ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Busca CNPJs que contenham o padrão especificado
+                </p>
+              </div>
+
+              {/* Context Search */}
+              <div className="space-y-2">
+                <Label>Buscar no Texto</Label>
+                <Input
+                  placeholder="Ex: João Silva, Banco do Brasil"
+                  onChange={(e) => setFilters(prev => ({ ...prev, contextSearch: e.target.value }))}
+                  value={filters.contextSearch || ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Busca termos específicos no contexto das detecções
+                </p>
               </div>
             </div>
           </div>
