@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Save, RotateCcw, Shield, Zap, Database, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { notifications } from "@/components/ui/notification-system";
 import { getBrazilianPatterns, type BrazilianPattern } from "@/lib/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -61,11 +62,20 @@ export default function SettingsSection() {
 
   const addCustomPattern = () => {
     if (!newPattern.name || !newPattern.regex) {
-      toast({
-        title: "Erro",
-        description: "Nome e regex são obrigatórios",
-        variant: "destructive"
-      });
+      notifications.error(
+        "Campos Obrigatórios",
+        "Nome e regex são obrigatórios para criar um padrão"
+      );
+      return;
+    }
+
+    try {
+      new RegExp(newPattern.regex);
+    } catch {
+      notifications.error(
+        "Regex Inválida",
+        "A expressão regular fornecida não é válida"
+      );
       return;
     }
 
@@ -84,10 +94,10 @@ export default function SettingsSection() {
 
     setNewPattern({ name: '', regex: '', riskLevel: 'medium' });
     
-    toast({
-      title: "Sucesso",
-      description: "Padrão personalizado adicionado"
-    });
+    notifications.success(
+      "Padrão Adicionado",
+      `Padrão personalizado "${pattern.name}" foi criado com sucesso`
+    );
   };
 
   const removeCustomPattern = (patternId: string) => {
@@ -104,19 +114,22 @@ export default function SettingsSection() {
 
   const saveSettings = async () => {
     try {
-      // For now, just save to localStorage since we don't have a settings endpoint yet
       localStorage.setItem('pii-detector-settings', JSON.stringify(settings));
+      
+      notifications.success(
+        "Configurações Salvas",
+        "Todas as configurações foram salvas com sucesso"
+      );
       
       toast({
         title: "Sucesso",
         description: "Configurações salvas com sucesso"
       });
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao salvar configurações",
-        variant: "destructive"
-      });
+      notifications.error(
+        "Erro ao Salvar",
+        "Não foi possível salvar as configurações"
+      );
     }
   };
 
