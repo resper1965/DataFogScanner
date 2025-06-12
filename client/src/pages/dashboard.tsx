@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("upload");
+  const [currentCase, setCurrentCase] = useState<Case | null>(null);
 
   return (
     <div className="flex h-screen bg-background-app">
@@ -58,6 +59,10 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto space-y-6">
             {activeSection === "upload" && (
               <>
+                <CaseConfiguration 
+                  currentCase={currentCase}
+                  onCaseCreated={setCurrentCase}
+                />
                 <UploadSection />
                 <ProcessingDashboard />
                 <ResultsSection />

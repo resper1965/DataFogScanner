@@ -94,13 +94,20 @@ export default function CaseConfiguration({ onCaseCreated, currentCase }: CaseCo
   const updateCaseMutation = useMutation({
     mutationFn: async (data: InsertCase) => {
       if (!currentCase) throw new Error("Nenhum caso selecionado");
-      return apiRequest(`/api/cases/${currentCase.id}`, {
+      const response = await fetch(`/api/cases/${currentCase.id}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           ...data,
           incidentDate: data.incidentDate.toISOString(),
         }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to update case");
+      }
+      return response.json();
     },
     onSuccess: (updatedCase: Case) => {
       toast({
