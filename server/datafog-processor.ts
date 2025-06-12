@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { storage } from './storage';
 import { getBrazilianPatterns } from '../client/src/lib/brazilian-patterns';
+import { fileTextExtractor } from './file-text-extractor';
 
 interface DetectionResult {
   type: string;
