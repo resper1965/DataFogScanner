@@ -36,15 +36,25 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
     }
 
     const filePath = file.path;
-    console.log(`Processando arquivo: ${file.originalName}`);
+    console.log(`Processando arquivo: ${file.originalName} (${file.mimeType})`);
 
     await storage.updateProcessingJobStatus(jobId, 'processing', 30);
 
-    // Executar detecção usando DataFog + regex brasileiro
+    // Extrair texto usando o novo extrator multiformat
+    const extractionResult = await fileTextExtractor.extractText(filePath, file.mimeType);
+    
+    if (!extractionResult.success) {
+      throw new Error(`Falha na extração de texto: ${extractionResult.error}`);
+    }
+
+    console.log(`Texto extraído: ${extractionResult.text.length} caracteres`);
+    
+    await storage.updateProcessingJobStatus(jobId, 'processing', 50);
+
+    // Executar detecção de dados brasileiros no texto extraído
     const allDetections: DetectionResult[] = [];
     
-    // Usar DataFog e regex personalizado
-    const detections = await runDataFogDetection(filePath, job.patterns, job.customRegex || undefined);
+    const detections = await runBrazilianDataDetection(extractionResult.text, job.fileId);
     allDetections.push(...detections);
 
     console.log(`Detecções encontradas: ${allDetections.length}`);
@@ -80,6 +90,68 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
       await storage.updateFileStatus(job.fileId, 'error');
     }
   }
+}
+
+async function runBrazilianDataDetection(text: string, fileId: number): Promise<DetectionResult[]> {
+  const patterns = {
+    'CPF': /(?:CPF[:\s]*)?(\d{3}\.?\d{3}\.?\d{3}[-\.]?\d{2})/gi,
+    'CNPJ': /(?:CNPJ[:\s]*)?(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}[-\.]?\d{2})/gi,
+    'RG': /(?:RG[:\s]*)?(\d{1,2}\.?\d{3}\.?\d{3}[-\.]?\d{1,2})/gi,
+    'CEP': /(\d{5}[-\.]?\d{3})/g,
+    'EMAIL': /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+    'TELEFONE': /(\(\d{2}\)\s?\d{4,5}[-\.]?\d{4})/g,
+    'PIS': /(?:PIS[:\s]*)?(\d{3}\.?\d{5}\.?\d{2}[-\.]?\d{1})/gi,
+    'NIRE': /(?:NIRE[:\s]*)?(\d{3}\.?\d{8}[-\.]?\d)/gi
+  };
+
+  const detections: DetectionResult[] = [];
+  const seen = new Set<string>();
+
+  for (const [type, pattern] of Object.entries(patterns)) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const value = match[1] || match[0];
+      
+      // Validação básica
+      if (type === 'CPF') {
+        const cpf = value.replace(/[^0-9]/g, '');
+        if (cpf.length !== 11 || cpf === '00000000000' || /^(\d)\1+$/.test(cpf)) {
+          continue;
+        }
+      }
+      
+      if (type === 'CNPJ') {
+        const cnpj = value.replace(/[^0-9]/g, '');
+        if (cnpj.length !== 14) {
+          continue;
+        }
+      }
+
+      // Evitar duplicatas
+      const key = `${type}-${value}`;
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+
+      // Extrair contexto
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      const context = text.substring(start, end).replace(/\s+/g, ' ').trim();
+
+      detections.push({
+        type,
+        value,
+        context,
+        position: match.index,
+        riskLevel: ['CPF', 'CNPJ'].includes(type) ? 'high' : 'medium',
+        confidence: 0.95,
+        source: 'regex'
+      });
+    }
+  }
+
+  return detections;
 }
 
 async function runDataFogDetection(
