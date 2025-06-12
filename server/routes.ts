@@ -180,6 +180,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete specific file
+  app.delete("/api/files/:id", async (req, res) => {
+    try {
+      const fileId = parseInt(req.params.id);
+      if (isNaN(fileId)) {
+        return res.status(400).json({ message: "ID de arquivo inválido" });
+      }
+
+      await storage.deleteFile(fileId);
+      res.json({ message: "Arquivo removido com sucesso" });
+    } catch (error) {
+      console.error("Erro ao remover arquivo:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Clear all files
+  app.delete("/api/files", async (req, res) => {
+    try {
+      await storage.deleteAllFiles();
+      res.json({ message: "Todos os arquivos foram removidos" });
+    } catch (error) {
+      console.error("Erro ao limpar arquivos:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Get processing jobs endpoint
   app.get("/api/processing/jobs", async (req, res) => {
     try {

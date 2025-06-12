@@ -18,11 +18,15 @@ export interface IStorage {
   getFile(id: number): Promise<File | undefined>;
   getFiles(): Promise<File[]>;
   updateFileStatus(id: number, status: string, processedAt?: Date): Promise<void>;
+  deleteFile(id: number): Promise<void>;
+  deleteAllFiles(): Promise<void>;
   
   // Detections
   createDetection(detection: InsertDetection): Promise<Detection>;
   getDetectionsByFileId(fileId: number): Promise<Detection[]>;
   getAllDetections(): Promise<Detection[]>;
+  deleteDetectionsByFileId(fileId: number): Promise<void>;
+  deleteAllDetections(): Promise<void>;
   
   // Cases
   createCase(caseData: InsertCase): Promise<Case>;
@@ -220,6 +224,42 @@ export class MemStorage implements IStorage {
         completedAt: new Date()
       });
     }
+  }
+
+  // File cleanup methods
+  async deleteFile(id: number): Promise<void> {
+    this.files.delete(id);
+    // Also delete associated detections and processing jobs
+    await this.deleteDetectionsByFileId(id);
+    // Delete associated processing jobs
+    const jobsToDelete: number[] = [];
+    this.processingJobs.forEach((job, jobId) => {
+      if (job.fileId === id) {
+        jobsToDelete.push(jobId);
+      }
+    });
+    jobsToDelete.forEach(jobId => this.processingJobs.delete(jobId));
+  }
+
+  async deleteAllFiles(): Promise<void> {
+    this.files.clear();
+    await this.deleteAllDetections();
+    this.processingJobs.clear();
+  }
+
+  // Detection cleanup methods
+  async deleteDetectionsByFileId(fileId: number): Promise<void> {
+    const detectionsToDelete: number[] = [];
+    this.detections.forEach((detection, id) => {
+      if (detection.fileId === fileId) {
+        detectionsToDelete.push(id);
+      }
+    });
+    detectionsToDelete.forEach(id => this.detections.delete(id));
+  }
+
+  async deleteAllDetections(): Promise<void> {
+    this.detections.clear();
   }
 }
 
