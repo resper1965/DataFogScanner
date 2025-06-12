@@ -1,46 +1,45 @@
 #!/bin/bash
 
-# Script para sincronizar Replit com GitHub
-echo "=== Sincronizando Replit com GitHub ==="
-
-# Configurar Git se necessário
-git config --global user.name "resper1965" 2>/dev/null || true
-git config --global user.email "your-email@example.com" 2>/dev/null || true
-
-# Verificar se já existe repositório local
-if [ ! -d ".git" ]; then
-    echo "Inicializando repositório Git..."
-    git init
-fi
-
-# Adicionar todos os arquivos importantes
-echo "Adicionando arquivos..."
-git add .
-
-# Fazer commit se houver mudanças
-if ! git diff --cached --quiet; then
-    echo "Fazendo commit das mudanças..."
-    git commit -m "sync: Update from Replit
-
-- DataFog PII Detector complete system
-- Brazilian document processing
-- Production Docker setup
-- VPS deployment ready"
-fi
-
-# Configurar remote se não existir
-if ! git remote get-url origin >/dev/null 2>&1; then
-    echo "Configurando remote GitHub..."
-    git remote add origin https://github.com/resper1965/PIIDetector.git
-fi
-
-# Configurar branch main
-git branch -M main
-
-# Sincronizar com GitHub
-echo "Sincronizando com GitHub..."
-git pull origin main --allow-unrelated-histories --no-rebase || true
-git push -u origin main
-
-echo "✅ Sincronização concluída!"
+echo "Sincronização Direta: Replit → GitHub"
 echo "Repositório: https://github.com/resper1965/PIIDetector"
+echo "========================================"
+
+echo ""
+echo "INSTRUÇÕES PARA SINCRONIZAÇÃO DIRETA:"
+echo ""
+echo "1. PAINEL GIT DO REPLIT:"
+echo "   - Na barra lateral esquerda, clique no ícone Git"
+echo "   - Você verá todos os arquivos modificados"
+echo "   - Clique em 'Stage all changes' ou '+' ao lado dos arquivos"
+echo ""
+echo "2. COMMIT:"
+echo "   - No campo de mensagem, digite:"
+echo "   'feat: sistema PII Detector n.CrisisOps completo - filtros @ness.com.br'"
+echo "   - Clique em 'Commit'"
+echo ""
+echo "3. PUSH:"
+echo "   - Clique em 'Push' para enviar ao GitHub"
+echo "   - Se solicitar autenticação, use seu token do GitHub"
+echo ""
+echo "4. VERIFICAR:"
+echo "   - Acesse: https://github.com/resper1965/PIIDetector"
+echo "   - Confirme que os arquivos foram atualizados"
+echo ""
+echo "ARQUIVOS PRINCIPAIS INCLUÍDOS:"
+echo "✓ client/ - Interface React completa"
+echo "✓ server/ - Backend Node.js funcional"
+echo "✓ shared/ - Schemas TypeScript"
+echo "✓ Dockerfile - Deploy produção"
+echo "✓ docker-compose.yml - Setup completo"
+echo "✓ README_FINAL.md - Documentação"
+echo ""
+echo "FUNCIONALIDADES PRONTAS:"
+echo "✓ Detecção dados brasileiros (CPF, CNPJ, RG, CEP)"
+echo "✓ Filtros avançados @ness.com.br"
+echo "✓ Sistema relatórios com gráficos"
+echo "✓ Configurações operacionais"
+echo "✓ Deploy Docker configurado"
+echo ""
+echo "Se o painel Git não aparecer:"
+echo "- Settings → Connected Services → Connect GitHub"
+echo "- Recarregue a página do Replit"
