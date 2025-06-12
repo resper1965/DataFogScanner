@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getBrazilianPatterns } from "@/lib/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import SecurityStatus from "./security-status";
@@ -23,6 +23,12 @@ export default function UploadSection() {
   const { toast } = useToast();
 
   const patterns = getBrazilianPatterns();
+
+  // Query to get uploaded files
+  const { data: uploadedFiles = [] } = useQuery({
+    queryKey: ["/api/files"],
+    refetchInterval: 2000,
+  }) as { data: any[] };
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -118,41 +124,23 @@ export default function UploadSection() {
   };
 
   const handleStartProcessing = async () => {
-    if (selectedFiles.length === 0) {
+    if (uploadedFiles.length === 0) {
       toast({
-        title: "Nenhum arquivo selecionado",
+        title: "Nenhum arquivo enviado",
         description: "Faça upload de arquivos primeiro",
         variant: "destructive",
       });
       return;
     }
 
-    // First upload files, then start processing
-    const formData = new FormData();
-    selectedFiles.forEach(file => {
-      formData.append('files', file);
+    // Use already uploaded files
+    const fileIds = uploadedFiles.map((file: any) => file.id);
+      
+    processingMutation.mutate({
+      fileIds,
+      patterns: selectedPatterns,
+      customRegex,
     });
-
-    try {
-      const uploadResponse = await apiRequest("POST", "/api/files/upload", formData);
-      const uploadData = await uploadResponse.json();
-      
-      const fileIds = uploadData.files.map((file: any) => file.id);
-      
-      processingMutation.mutate({
-        fileIds,
-        patterns: selectedPatterns,
-        customRegex,
-      });
-      
-      setSelectedFiles([]);
-    } catch (error) {
-      toast({
-        title: "Erro no upload",
-        description: "Erro ao enviar arquivos",
-        variant: "destructive",
-      });
-    }
   };
 
   const togglePattern = (patternId: string) => {
@@ -323,7 +311,7 @@ export default function UploadSection() {
           {/* Process Button */}
           <Button 
             onClick={handleStartProcessing}
-            disabled={selectedFiles.length === 0 || processingMutation.isPending}
+            disabled={uploadedFiles.length === 0 || processingMutation.isPending}
             className="w-full bg-green-600 hover:bg-green-700"
           >
             <div className="flex items-center justify-center space-x-2">
