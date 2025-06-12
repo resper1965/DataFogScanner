@@ -104,10 +104,8 @@ export default function SettingsSection() {
 
   const saveSettings = async () => {
     try {
-      await apiRequest('/api/settings', {
-        method: 'POST',
-        body: JSON.stringify(settings)
-      });
+      // For now, just save to localStorage since we don't have a settings endpoint yet
+      localStorage.setItem('pii-detector-settings', JSON.stringify(settings));
       
       toast({
         title: "Sucesso",
