@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import { processFiles } from "./datafog-processor";
 import { extractZipFiles } from "./file-handler";
+import { securityScanner } from "./security-scanner";
 
 const upload = multer({ 
   dest: 'uploads/',

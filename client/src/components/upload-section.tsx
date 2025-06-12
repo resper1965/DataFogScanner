@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { CloudUpload, File, X, Search } from "lucide-react";
+import { CloudUpload, File, X, Search, Brain, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { getBrazilianPatterns } from "@/lib/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ export default function UploadSection() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedPatterns, setSelectedPatterns] = useState<string[]>(['cpf', 'cnpj', 'email']);
   const [customRegex, setCustomRegex] = useState("");
+  const [useSemanticAI, setUseSemanticAI] = useState(true);
   const { toast } = useToast();
 
   const patterns = getBrazilianPatterns();
@@ -263,6 +265,26 @@ export default function UploadSection() {
             </div>
           </div>
 
+          {/* AI Enhancement Settings */}
+          <div className="border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <Brain className="text-primary h-4 w-4" />
+                <Label htmlFor="semantic-ai" className="font-medium text-foreground">
+                  Classificação Semântica com IA
+                </Label>
+              </div>
+              <Switch
+                id="semantic-ai"
+                checked={useSemanticAI}
+                onCheckedChange={setUseSemanticAI}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Usa IA para validar nomes completos, endereços e documentos complexos, reduzindo falsos positivos
+            </p>
+          </div>
+
           {/* Custom Regex */}
           <div className="border border-border rounded-lg p-4">
             <Label htmlFor="custom-regex" className="font-medium text-foreground mb-3 block">
@@ -284,7 +306,19 @@ export default function UploadSection() {
             disabled={selectedFiles.length === 0 || processingMutation.isPending}
             className="w-full bg-green-600 hover:bg-green-700"
           >
-            {processingMutation.isPending ? "Iniciando..." : "Iniciar Processamento"}
+            <div className="flex items-center justify-center space-x-2">
+              {processingMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>Iniciando...</span>
+                </>
+              ) : (
+                <>
+                  {useSemanticAI ? <Brain className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
+                  <span>{useSemanticAI ? "Processar com IA" : "Processar com Regex"}</span>
+                </>
+              )}
+            </div>
           </Button>
         </CardContent>
       </Card>

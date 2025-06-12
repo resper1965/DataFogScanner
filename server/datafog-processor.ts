@@ -216,8 +216,11 @@ class MockDataFog:
         results = []
         
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
+            if file_path == 'temp_content':
+                content = """${content ? content.replace(/"/g, '\\"').replace(/\n/g, '\\n') : ''}"""
+            else:
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
                 
             # Search for enabled patterns
             for pattern_name in enabled_patterns:
