@@ -1,0 +1,12 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "datafog>=4.2.0",
+    "openpyxl>=3.1.5",
+    "pypdf2>=3.0.1",
+    "python-docx>=1.1.2",
+    "regex>=2024.11.6",
+]

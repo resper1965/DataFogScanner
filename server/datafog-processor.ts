@@ -161,7 +161,7 @@ async function runPythonDataFogScript(
       
       fs.writeFile(tempScriptPath, scriptContent)
         .then(() => {
-          const pythonProcess = spawn('python3', [tempScriptPath], {
+          const pythonProcess = spawn('python', [tempScriptPath], {
             stdio: ['pipe', 'pipe', 'pipe']
           });
 

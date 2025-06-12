@@ -1,0 +1,35 @@
+RELATÓRIO DE CLIENTES - CONFIDENCIAL
+
+Nome: João Silva Santos
+CPF: 123.456.789-10
+RG: 12.345.678-9
+Data Nascimento: 15/03/1985
+Email: joao.silva@exemplo.com.br
+Telefone: (11) 98765-4321
+
+Empresa: Silva & Associados Ltda
+CNPJ: 12.345.678/0001-95
+Inscrição Estadual: 123.456.789.123
+
+Dados Bancários:
+Banco Itaú (341)
+Agência: 1234
+Conta Corrente: 567890-1
+PIX: joao.silva@exemplo.com.br
+
+Endereço:
+Rua das Flores, 123
+CEP: 01234-567
+São Paulo - SP
+
+Cartão de Crédito: 4532 1234 5678 9012
+Validade: 12/25
+CVV: 123
+
+PIS/PASEP: 123.45678.90-1
+Título de Eleitor: 1234.5678.0191
+CNH: 12345678901
+
+Observações:
+Cliente VIP desde 2020
+Limite especial autorizado
