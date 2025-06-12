@@ -343,7 +343,7 @@ export default function ReportsSection() {
               <div className="space-y-2">
                 <Label>Domínio de Email</Label>
                 <Input
-                  placeholder="Ex: bradesco.com.br"
+                  placeholder="Ex: ness.com.br"
                   onChange={(e) => setFilters(prev => ({ ...prev, emailDomain: e.target.value }))}
                   value={filters.emailDomain || ''}
                 />
@@ -418,9 +418,9 @@ export default function ReportsSection() {
               <Button 
                 size="sm" 
                 variant="outline" 
-                onClick={() => setFilters(prev => ({ ...prev, emailDomain: 'bradesco.com.br' }))}
+                onClick={() => setFilters(prev => ({ ...prev, emailDomain: 'ness.com.br' }))}
               >
-                Emails Bradesco
+                Emails Ness
               </Button>
               <Button 
                 size="sm" 

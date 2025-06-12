@@ -1,0 +1,6 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="120" height="40" rx="8" fill="#00ade0"/>
+  <text x="15" y="28" font-family="Montserrat, sans-serif" font-size="20" font-weight="700" fill="white">n</text>
+  <circle cx="27" cy="24" r="2" fill="white"/>
+  <text x="35" y="28" font-family="Montserrat, sans-serif" font-size="16" font-weight="600" fill="white">ness</text>
+</svg>
