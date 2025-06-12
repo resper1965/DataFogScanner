@@ -25,7 +25,9 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <Shield className="text-primary-foreground text-lg" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">DataFog</h1>
+            <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              ness<span style={{ color: '#00ade0' }}>.</span>
+            </h1>
             <p className="text-sm text-muted-foreground">Proteção de Dados</p>
           </div>
         </div>

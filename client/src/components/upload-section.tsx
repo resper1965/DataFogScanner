@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { CloudUpload, File, X } from "lucide-react";
+import { CloudUpload, File, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -241,17 +241,23 @@ export default function UploadSection() {
           {/* Brazilian Document Patterns */}
           <div className="border border-border rounded-lg p-4">
             <h4 className="font-medium text-foreground mb-3">Documentos Brasileiros</h4>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto">
               {patterns.map((pattern) => (
-                <div key={pattern.id} className="flex items-center space-x-2">
+                <div key={pattern.id} className="flex items-start space-x-2 p-2 rounded hover:bg-muted">
                   <Checkbox
                     id={pattern.id}
                     checked={selectedPatterns.includes(pattern.id)}
                     onCheckedChange={() => togglePattern(pattern.id)}
+                    className="mt-1"
                   />
-                  <Label htmlFor={pattern.id} className="text-sm">
-                    {pattern.name}
-                  </Label>
+                  <div className="flex-1">
+                    <Label htmlFor={pattern.id} className="text-sm font-medium cursor-pointer">
+                      {pattern.name}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {pattern.description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

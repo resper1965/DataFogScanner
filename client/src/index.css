@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,7 +15,7 @@
   --card-foreground: hsl(0, 0%, 15%);
   --border: hsl(0, 0%, 90%);
   --input: hsl(0, 0%, 90%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(193, 100%, 44%);
   --primary-foreground: hsl(0, 0%, 98%);
   --secondary: hsl(0, 0%, 96%);
   --secondary-foreground: hsl(0, 0%, 15%);
@@ -21,10 +23,11 @@
   --accent-foreground: hsl(0, 0%, 15%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(207, 90%, 54%);
+  --ring: hsl(193, 100%, 44%);
   --radius: 0.5rem;
   
-  /* Custom colors for DataFog app */
+  /* Custom colors for Ness DataFog app */
+  --ness-blue: hsl(193, 100%, 44%); /* #00ade0 */
   --success: hsl(122, 100%, 39%);
   --warning: hsl(14, 100%, 57%);
   --error: hsl(4, 90%, 58%);
@@ -32,12 +35,12 @@
   --background-app: hsl(0, 0%, 98%);
   --sidebar-background: hsl(0, 0%, 100%);
   --sidebar-foreground: hsl(0, 0%, 15%);
-  --sidebar-primary: hsl(207, 90%, 54%);
+  --sidebar-primary: hsl(193, 100%, 44%);
   --sidebar-primary-foreground: hsl(0, 0%, 98%);
   --sidebar-accent: hsl(0, 0%, 96%);
   --sidebar-accent-foreground: hsl(0, 0%, 15%);
   --sidebar-border: hsl(0, 0%, 90%);
-  --sidebar-ring: hsl(207, 90%, 54%);
+  --sidebar-ring: hsl(193, 100%, 44%);
 }
 
 .dark {
@@ -69,7 +72,7 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Montserrat', sans-serif;
   }
 }
 
