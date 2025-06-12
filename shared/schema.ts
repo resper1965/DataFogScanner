@@ -30,6 +30,8 @@ export const detections = pgTable("detections", {
   context: text("context"),
   riskLevel: text("risk_level").notNull(), // high, medium, low
   position: integer("position"),
+  ownerName: text("owner_name"), // Nome do titular do documento
+  documentType: text("document_type"), // Tipo de documento (RG, CPF, etc.)
   createdAt: timestamp("created_at").defaultNow(),
 });
 

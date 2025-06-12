@@ -199,6 +199,7 @@ export default function ReportsSection() {
       'Data': new Date(detection.createdAt || '').toLocaleDateString('pt-BR'),
       'Tipo': detection.type,
       'Valor': detection.value,
+      'Titular': (detection as any).ownerName || 'Não identificado',
       'Contexto': detection.context,
       'Risco': getRiskLevelText(detection.riskLevel),
       'Posição': detection.position,
@@ -267,24 +268,26 @@ export default function ReportsSection() {
       const tableData = filteredDetections.slice(0, 50).map(detection => [
         format(new Date(detection.createdAt || ''), 'dd/MM/yyyy'),
         detection.type,
-        detection.value.length > 30 ? detection.value.substring(0, 30) + '...' : detection.value,
+        detection.value.length > 25 ? detection.value.substring(0, 25) + '...' : detection.value,
+        (detection as any).ownerName || 'Não identificado',
         getRiskLevelText(detection.riskLevel),
-        detection.context && detection.context.length > 40 ? detection.context.substring(0, 40) + '...' : detection.context || ''
+        detection.context && detection.context.length > 30 ? detection.context.substring(0, 30) + '...' : detection.context || ''
       ]);
       
       autoTable(doc, {
-        head: [['Data', 'Tipo', 'Valor', 'Risco', 'Contexto']],
+        head: [['Data', 'Tipo', 'Valor', 'Titular', 'Risco', 'Contexto']],
         body: tableData,
         startY: yPosition,
         theme: 'striped',
         headStyles: { fillColor: [51, 51, 51] },
         styles: { fontSize: 8, cellPadding: 2 },
         columnStyles: {
-          0: { cellWidth: 25 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 40 },
-          3: { cellWidth: 20 },
-          4: { cellWidth: 75 }
+          0: { cellWidth: 20 },
+          1: { cellWidth: 15 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 15 },
+          5: { cellWidth: 65 }
         }
       });
       

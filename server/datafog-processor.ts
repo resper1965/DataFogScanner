@@ -13,6 +13,8 @@ interface DetectionResult {
   riskLevel: 'high' | 'medium' | 'low';
   confidence?: number;
   source?: 'regex' | 'semantic' | 'hybrid';
+  ownerName?: string;
+  documentType?: string;
 }
 
 export async function processFiles(jobIds: number[]): Promise<void> {
@@ -92,7 +94,9 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
         value: detection.value,
         context: detection.context,
         riskLevel: detection.riskLevel,
-        position: detection.position
+        position: detection.position,
+        ownerName: detection.ownerName,
+        documentType: detection.documentType
       });
 
       // Atualizar progresso durante salvamento (75% a 90%)
@@ -121,6 +125,61 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
   }
 }
 
+// Função para extrair nomes brasileiros do texto
+function extractBrazilianNames(text: string): string[] {
+  // Padrões comuns para identificar nomes em documentos brasileiros
+  const namePatterns = [
+    /(?:Nome[:\s]+)([A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+(?:\s+[A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+)+)/gi,
+    /(?:Titular[:\s]+)([A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+(?:\s+[A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+)+)/gi,
+    /(?:Portador[:\s]+)([A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+(?:\s+[A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+)+)/gi,
+    /(?:Funcionário[:\s]+)([A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+(?:\s+[A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+)+)/gi,
+    // Padrão geral para nomes próprios (2-4 palavras)
+    /\b([A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+\s+(?:[A-ZÀÁÂÃÉÊÍÓÔÕÚÇ][a-zàáâãéêíóôõúç]+\s*){1,3})\b/g
+  ];
+
+  const names = new Set<string>();
+  
+  for (const pattern of namePatterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const name = match[1].trim();
+      
+      // Filtrar nomes válidos (pelo menos 2 palavras, não muito longos)
+      const words = name.split(/\s+/);
+      if (words.length >= 2 && words.length <= 4 && name.length <= 50) {
+        // Verificar se não são palavras comuns de documentos
+        const commonWords = ['DATA', 'DOCUMENTO', 'REGISTRO', 'NUMERO', 'CODIGO', 'ENDERECO', 'TELEFONE'];
+        if (!commonWords.some(word => name.toUpperCase().includes(word))) {
+          names.add(name);
+        }
+      }
+    }
+  }
+
+  return Array.from(names);
+}
+
+// Função para encontrar o nome mais próximo de uma detecção
+function findClosestName(text: string, position: number, names: string[]): string | null {
+  if (names.length === 0) return null;
+
+  let closestName = null;
+  let closestDistance = Infinity;
+
+  for (const name of names) {
+    const nameIndex = text.indexOf(name);
+    if (nameIndex !== -1) {
+      const distance = Math.abs(nameIndex - position);
+      if (distance < closestDistance && distance < 200) { // Máximo 200 caracteres de distância
+        closestDistance = distance;
+        closestName = name;
+      }
+    }
+  }
+
+  return closestName;
+}
+
 async function runBrazilianDataDetection(text: string, fileId: number): Promise<DetectionResult[]> {
   const patterns = {
     'CPF': /(?:CPF[:\s]*)?(\d{3}\.?\d{3}\.?\d{3}[-\.]?\d{2})/gi,
@@ -132,6 +191,10 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
     'PIS': /(?:PIS[:\s]*)?(\d{3}\.?\d{5}\.?\d{2}[-\.]?\d{1})/gi,
     'NIRE': /(?:NIRE[:\s]*)?(\d{3}\.?\d{8}[-\.]?\d)/gi
   };
+
+  // Extrair nomes do documento
+  const extractedNames = extractBrazilianNames(text);
+  console.log(`Nomes extraídos do documento: ${extractedNames.join(', ')}`);
 
   const detections: DetectionResult[] = [];
   const seen = new Set<string>();
@@ -168,6 +231,9 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
       const end = Math.min(text.length, match.index + match[0].length + 50);
       const context = text.substring(start, end).replace(/\s+/g, ' ').trim();
 
+      // Encontrar nome do titular mais próximo
+      const ownerName = findClosestName(text, match.index, extractedNames);
+
       detections.push({
         type,
         value,
@@ -175,7 +241,9 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
         position: match.index,
         riskLevel: ['CPF', 'CNPJ'].includes(type) ? 'high' : 'medium',
         confidence: 0.95,
-        source: 'regex'
+        source: 'regex',
+        ownerName: ownerName || undefined,
+        documentType: type
       });
     }
   }
