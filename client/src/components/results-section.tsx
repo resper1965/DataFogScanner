@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, PieChart, Download, ExternalLink } from "lucide-react";
+import { AlertTriangle, PieChart, Download, ExternalLink, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { getRiskLevelColor, getRiskLevelBadgeColor, getRiskLevelText } from "@/lib/brazilian-patterns";
 import { apiRequest } from "@/lib/queryClient";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function ResultsSection() {
   const { data: detections = [] } = useQuery({
@@ -37,6 +41,78 @@ export default function ResultsSection() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Erro ao exportar relatório:', error);
+    }
+  };
+
+  const exportToPDF = async () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Cabeçalho
+      doc.setFont('helvetica');
+      doc.setFontSize(18);
+      doc.text('Relatório de Detecções - PII Detector', 20, 20);
+      
+      doc.setFontSize(12);
+      doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 20, 30);
+      
+      // Estatísticas
+      let yPos = 50;
+      doc.setFontSize(14);
+      doc.text('Resumo das Detecções', 20, yPos);
+      yPos += 15;
+      
+      doc.setFontSize(10);
+      doc.text(`Total de Detecções: ${detections.length}`, 20, yPos);
+      yPos += 8;
+      doc.text(`Alto Risco: ${highRiskCount}`, 20, yPos);
+      yPos += 8;
+      doc.text(`Médio Risco: ${mediumRiskCount}`, 20, yPos);
+      yPos += 8;
+      doc.text(`Baixo Risco: ${lowRiskCount}`, 20, yPos);
+      yPos += 15;
+      
+      // Tabela de detecções
+      const tableData = recentDetections.slice(0, 20).map((detection: any) => [
+        format(new Date(detection.createdAt || ''), 'dd/MM/yyyy'),
+        detection.type,
+        detection.value.length > 25 ? detection.value.substring(0, 25) + '...' : detection.value,
+        getRiskLevelText(detection.riskLevel),
+        detection.context && detection.context.length > 30 
+          ? detection.context.substring(0, 30) + '...' 
+          : detection.context || ''
+      ]);
+      
+      autoTable(doc, {
+        head: [['Data', 'Tipo', 'Valor', 'Risco', 'Contexto']],
+        body: tableData,
+        startY: yPos,
+        theme: 'striped',
+        headStyles: { fillColor: [41, 128, 185] },
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 35 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 80 }
+        }
+      });
+      
+      // Rodapé
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(`Página ${i} de ${pageCount}`, 170, 285);
+        doc.text('PII Detector DataFog', 20, 285);
+      }
+      
+      const fileName = `deteccoes_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
     }
   };
 

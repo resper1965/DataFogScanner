@@ -31,6 +31,8 @@ import {
   Area,
   AreaChart
 } from "recharts";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import type { Detection, File, Case } from "@shared/schema";
 
 interface ReportFilters {
@@ -217,8 +219,91 @@ export default function ReportsSection() {
   };
 
   const exportToPDF = async () => {
-    // Generate PDF report (would need pdf generation library)
-    console.log('Exportando relatório PDF...');
+    try {
+      const doc = new jsPDF();
+      
+      // Configurar fonte para suporte a português
+      doc.setFont('helvetica');
+      
+      // Cabeçalho do relatório
+      doc.setFontSize(20);
+      doc.text('Relatório de Dados Sensíveis - PII Detector', 20, 20);
+      
+      doc.setFontSize(12);
+      doc.text(`Gerado em: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 20, 30);
+      
+      // Estatísticas gerais
+      let yPosition = 50;
+      doc.setFontSize(14);
+      doc.text('Resumo Executivo', 20, yPosition);
+      yPosition += 10;
+      
+      doc.setFontSize(10);
+      doc.text(`Total de Detecções: ${stats.totalDetections}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Total de Arquivos: ${files.length}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Alto Risco: ${stats.byRiskLevel.high || 0}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Médio Risco: ${stats.byRiskLevel.medium || 0}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Baixo Risco: ${stats.byRiskLevel.low || 0}`, 20, yPosition);
+      yPosition += 15;
+      
+      // Distribuição por tipo
+      doc.setFontSize(14);
+      doc.text('Distribuição por Tipo de Dado', 20, yPosition);
+      yPosition += 10;
+      
+      doc.setFontSize(10);
+      Object.entries(stats.byType).forEach(([type, count]) => {
+        doc.text(`${type}: ${count}`, 20, yPosition);
+        yPosition += 6;
+      });
+      
+      yPosition += 10;
+      
+      // Tabela de detecções
+      const tableData = filteredDetections.slice(0, 50).map(detection => [
+        format(new Date(detection.createdAt || ''), 'dd/MM/yyyy'),
+        detection.type,
+        detection.value.length > 30 ? detection.value.substring(0, 30) + '...' : detection.value,
+        getRiskLevelText(detection.riskLevel),
+        detection.context && detection.context.length > 40 ? detection.context.substring(0, 40) + '...' : detection.context || ''
+      ]);
+      
+      autoTable(doc, {
+        head: [['Data', 'Tipo', 'Valor', 'Risco', 'Contexto']],
+        body: tableData,
+        startY: yPosition,
+        theme: 'striped',
+        headStyles: { fillColor: [51, 51, 51] },
+        styles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 75 }
+        }
+      });
+      
+      // Rodapé
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(`Página ${i} de ${pageCount}`, 170, 290);
+        doc.text('PII Detector DataFog - Confidencial', 20, 290);
+      }
+      
+      // Download do arquivo
+      const fileName = `relatorio_pii_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+    }
   };
 
   return (
