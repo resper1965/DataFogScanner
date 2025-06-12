@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: datafog-postgres
+    environment:
+      POSTGRES_DB: datafog
+      POSTGRES_USER: datafog_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-datafog_secure_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datafog_user -d datafog"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis for session storage and caching
+  redis:
+    image: redis:7-alpine
+    container_name: datafog-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Main Application
+  app:
+    build: .
+    container_name: datafog-app
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://datafog_user:${POSTGRES_PASSWORD:-datafog_secure_password}@postgres:5432/datafog
+      REDIS_URL: redis://redis:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SESSION_SECRET: ${SESSION_SECRET:-your-super-secret-session-key-change-this}
+      PORT: 5000
+      # Security settings
+      RATE_LIMIT_WINDOW_MS: 900000  # 15 minutes
+      RATE_LIMIT_MAX_REQUESTS: 100
+      MAX_FILE_SIZE: 104857600      # 100MB
+      MAX_FILES_PER_UPLOAD: 10
+      # Processing settings
+      MAX_CONCURRENT_JOBS: 5
+      PROCESSING_TIMEOUT_MS: 300000 # 5 minutes
+      # SFTP settings (optional)
+      SFTP_HOST: ${SFTP_HOST:-}
+      SFTP_PORT: ${SFTP_PORT:-22}
+      SFTP_USERNAME: ${SFTP_USERNAME:-}
+      SFTP_PASSWORD: ${SFTP_PASSWORD:-}
+      SFTP_PRIVATE_KEY_PATH: ${SFTP_PRIVATE_KEY_PATH:-}
+    ports:
+      - "5000:5000"
+    volumes:
+      - app_uploads:/app/uploads
+      - app_logs:/app/logs
+      - sftp_keys:/app/sftp-keys:ro  # Mount SSH keys if needed
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Nginx reverse proxy (optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: datafog-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # Mount SSL certificates
+    depends_on:
+      - app
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_uploads:
+    driver: local
+  app_logs:
+    driver: local
+  sftp_keys:
+    driver: local
+
+networks:
+  default:
+    name: datafog-network
