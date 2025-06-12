@@ -1,80 +1,85 @@
 #!/bin/bash
 
-# DataFog PII Detector - Git Repository Setup Script
-echo "=== DataFog PII Detector - Configuração do Repositório Git ==="
+echo "Configuração GitHub - PII Detector n.CrisisOps"
+echo "=============================================="
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Criar arquivo de instruções para o usuário
+cat > UPLOAD_TO_GITHUB.md << 'EOF'
+# Como Sincronizar com GitHub
 
-print_step() {
-    echo -e "${GREEN}[STEP]${NC} $1"
-}
+## Método 1: Criar Repositório Manualmente
 
-print_warning() {
-    echo -e "${YELLOW}[INFO]${NC} $1"
-}
+1. **Ir para GitHub**: https://github.com/new
+2. **Nome**: PIIDetector
+3. **Descrição**: Sistema de detecção de dados pessoais brasileiros - n.CrisisOps
+4. **Visibilidade**: Private
+5. **NÃO marcar** "Add a README file"
 
-# Check if git is installed
-if ! command -v git &> /dev/null; then
-    echo "Git não encontrado. Instalando..."
-    sudo apt update && sudo apt install -y git
-fi
+## Método 2: Download + Upload
 
-# Initialize repository if not already done
-if [ ! -d ".git" ]; then
-    print_step "Inicializando repositório Git..."
-    git init
-else
-    print_warning "Repositório Git já existe"
-fi
+1. **No Replit**: Menu → Download as ZIP
+2. **Extrair** o arquivo ZIP
+3. **GitHub**: Arrastar arquivos para o repositório criado
+4. **Commit**: "feat: sistema PII Detector n.CrisisOps completo"
 
-# Configure git user if not set
-if [ -z "$(git config user.name)" ]; then
-    echo "Configure seu nome de usuário Git:"
-    read -p "Nome: " git_name
-    git config user.name "$git_name"
-fi
+## Método 3: Git Clone (Local)
 
-if [ -z "$(git config user.email)" ]; then
-    echo "Configure seu email Git:"
-    read -p "Email: " git_email
-    git config user.email "$git_email"
-fi
+```bash
+# Baixar ZIP do Replit
+# Extrair para pasta local
+# Depois:
 
-# Add all files
-print_step "Adicionando arquivos ao repositório..."
+git init
 git add .
+git commit -m "feat: sistema PII Detector n.CrisisOps completo"
+git branch -M main
+git remote add origin https://github.com/resper1965/PIIDetector.git
+git push -u origin main
+```
 
-# Show status
-print_step "Status do repositório:"
-git status
+## Arquivos Incluídos
 
-# Create initial commit
-print_step "Criando commit inicial..."
-git commit -m "feat: Initial commit - DataFog PII Detector
+- `client/` - Interface React completa
+- `server/` - Backend Node.js funcional
+- `shared/` - Schemas TypeScript
+- `Dockerfile` - Deploy produção
+- `docker-compose.yml` - Setup completo
+- Documentação completa
 
-- Complete web application for Brazilian PII detection
-- React/TypeScript frontend with Portuguese interface
-- Node.js/Express backend with DataFog integration
-- PostgreSQL database with Drizzle ORM
-- Docker containerization for VPS deployment
-- Security scanning with ClamAV
-- Semantic AI analysis with OpenAI
-- Case management system
-- Real-time processing dashboard
-- Brazilian document support (CPF, CNPJ, RG, CEP)
-- SFTP integration for file monitoring
-- Production-ready deployment scripts"
+## Deploy Imediato
 
-print_step "Repositório configurado com sucesso!"
+```bash
+docker-compose up -d
+```
+
+## Funcionalidades Prontas
+
+- Detecção CPF, CNPJ, RG, CEP, emails, telefones
+- Filtros avançados @ness.com.br
+- Sistema de relatórios com gráficos
+- Configurações operacionais
+- Deploy Docker configurado
+EOF
+
+echo "Instruções criadas em: UPLOAD_TO_GITHUB.md"
+
+# Mostrar opções disponíveis
 echo ""
-print_warning "Próximos passos:"
-echo "1. Adicione o remote do seu repositório"
-echo "2. Envie o código para o GitHub"
+echo "OPÇÕES PARA SINCRONIZAR:"
 echo ""
-print_warning "Comandos para conectar ao seu repositório:"
-echo "git remote add origin https://github.com/resper1965/PIIDetector.git"
-echo "git branch -M main"
-echo "git push -u origin main"
+echo "1. DOWNLOAD ZIP (Mais Simples):"
+echo "   - Menu Replit → Download as ZIP"
+echo "   - Criar repositório no GitHub"
+echo "   - Arrastar arquivos para o repositório"
+echo ""
+echo "2. INTERFACE REPLIT:"
+echo "   - Sidebar → Git → Connect to GitHub"
+echo "   - Autorizar conta GitHub"
+echo "   - Create repository"
+echo ""
+echo "3. MANUAL COMMAND:"
+echo "   - Primeiro criar repositório em: https://github.com/new"
+echo "   - Nome: PIIDetector"
+echo "   - Depois executar comandos Git"
+echo ""
+echo "Arquivo com instruções completas: UPLOAD_TO_GITHUB.md"
