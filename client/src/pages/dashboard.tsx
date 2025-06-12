@@ -124,15 +124,7 @@ export default function Dashboard() {
             )}
             {activeSection === "dashboard" && <ProcessingDashboard />}
             {activeSection === "search" && <ResultsSection />}
-            {activeSection === "reports" && (
-              <div className="bg-surface rounded-lg card-shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Relatórios</h3>
-                <p className="text-muted-foreground">
-                  Seção de relatórios em desenvolvimento. Aqui você poderá visualizar 
-                  relatórios detalhados sobre os dados sensíveis detectados.
-                </p>
-              </div>
-            )}
+            {activeSection === "reports" && <ReportsSection />}
             {activeSection === "settings" && (
               <div className="bg-surface rounded-lg card-shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Configurações</h3>

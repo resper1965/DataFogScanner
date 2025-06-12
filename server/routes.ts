@@ -249,6 +249,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get detection statistics for reports
+  app.get("/api/reports/stats", async (req, res) => {
+    try {
+      const detections = await storage.getAllDetections();
+      const files = await storage.getFiles();
+      const cases = await storage.getCases();
+
+      // Calculate statistics
+      const stats = {
+        totalDetections: detections.length,
+        totalFiles: files.length,
+        totalCases: cases.length,
+        byRiskLevel: detections.reduce((acc, d) => {
+          acc[d.riskLevel] = (acc[d.riskLevel] || 0) + 1;
+          return acc;
+        }, {} as { [key: string]: number }),
+        byType: detections.reduce((acc, d) => {
+          acc[d.type] = (acc[d.type] || 0) + 1;
+          return acc;
+        }, {} as { [key: string]: number }),
+        byDate: detections.reduce((acc, d) => {
+          const date = new Date(d.createdAt || '').toISOString().split('T')[0];
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {} as { [key: string]: number }),
+        recentDetections: detections
+          .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
+          .slice(0, 10)
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Security scan endpoint
   app.post("/api/files/:id/security-scan", async (req, res) => {
     try {
