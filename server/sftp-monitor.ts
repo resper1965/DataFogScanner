@@ -3,6 +3,7 @@ import { readdir, stat, rename } from "fs/promises";
 import path from "path";
 import { storage } from "./storage";
 import { processFiles } from "./datafog-processor";
+import { securityScanner } from "./security-scanner";
 
 const SFTP_INCOMING_DIR = "/home/datafog/uploads/sftp/incoming";
 const SFTP_PROCESSING_DIR = "/home/datafog/uploads/sftp/processing";
@@ -63,6 +64,18 @@ class SFTPMonitor {
       const fileName = path.basename(filePath);
       console.log(`Novo arquivo SFTP detectado: ${fileName}`);
 
+      // Security scan before processing
+      console.log(`Escaneando arquivo SFTP: ${fileName}`);
+      const scanResult = await securityScanner.scanFile(filePath);
+      
+      if (!scanResult.isClean && scanResult.riskLevel === 'dangerous') {
+        console.error(`Arquivo SFTP perigoso detectado: ${fileName}`, scanResult.threats);
+        // Move to quarantine instead of processing
+        const quarantinePath = path.join(SFTP_PROCESSED_DIR, `QUARANTINE_${fileName}`);
+        await rename(filePath, quarantinePath);
+        return;
+      }
+
       // Move file to processing directory
       const processingPath = path.join(SFTP_PROCESSING_DIR, fileName);
       await rename(filePath, processingPath);
@@ -74,7 +87,7 @@ class SFTPMonitor {
         size: stats.size,
         mimeType: this.getMimeType(fileName),
         path: processingPath,
-        status: "uploaded"
+        status: scanResult.riskLevel === 'suspicious' ? "quarantine" : "uploaded"
       });
 
       // Create processing job with default Brazilian patterns

@@ -26,17 +26,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uploadedFiles = [];
       
       for (const file of req.files) {
+        // Verificação de segurança antes do processamento
+        console.log(`Escaneando arquivo: ${file.originalname}`);
+        const scanResult = await securityScanner.scanFile(file.path);
+        
+        if (!scanResult.isClean && scanResult.riskLevel === 'dangerous') {
+          console.error(`Arquivo perigoso detectado: ${file.originalname}`, scanResult.threats);
+          return res.status(400).json({ 
+            message: `Arquivo "${file.originalname}" foi rejeitado por conter ameaças de segurança`,
+            threats: scanResult.threats.map(t => `${t.type}: ${t.description}`)
+          });
+        }
+
         const fileData = {
           name: file.filename,
           originalName: file.originalname,
           size: file.size,
           mimeType: file.mimetype,
           path: file.path,
-          status: "uploaded"
+          status: scanResult.riskLevel === 'suspicious' ? "quarantine" : "uploaded"
         };
 
         const validatedFile = insertFileSchema.parse(fileData);
         const savedFile = await storage.createFile(validatedFile);
+        
+        // Log das informações de segurança (removido campo direto no objeto)
+        console.log(`Arquivo ${file.originalname} - Segurança: ${scanResult.riskLevel}, Ameaças: ${scanResult.threats.length}`);
+        
         uploadedFiles.push(savedFile);
       }
 
@@ -125,6 +141,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(detections);
     } catch (error) {
       console.error("Erro ao buscar detecções:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Security scan endpoint
+  app.post("/api/files/:id/security-scan", async (req, res) => {
+    try {
+      const fileId = parseInt(req.params.id);
+      const file = await storage.getFile(fileId);
+      
+      if (!file) {
+        return res.status(404).json({ message: "Arquivo não encontrado" });
+      }
+
+      const scanResult = await securityScanner.scanFile(file.path);
+      
+      res.json({
+        fileId,
+        fileName: file.originalName,
+        scanResult: {
+          isClean: scanResult.isClean,
+          riskLevel: scanResult.riskLevel,
+          threats: scanResult.threats,
+          metadata: scanResult.metadata,
+          scannedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("Erro no escaneamento de segurança:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
