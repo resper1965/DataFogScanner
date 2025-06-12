@@ -46,8 +46,11 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
     const detections = await runDataFogDetection(filePath, job.patterns, job.customRegex || undefined);
     allDetections.push(...detections);
 
+    console.log(`Detecções encontradas: ${allDetections.length}`);
+    
     // Salvar detecções no storage
     for (const detection of allDetections) {
+      console.log(`Salvando detecção: ${detection.type} - ${detection.value}`);
       await storage.createDetection({
         fileId: file.id,
         type: detection.type,
@@ -123,10 +126,14 @@ async function runDataFogDetection(
             }
 
             try {
+              console.log('Output do Python:', output);
+              console.log('Error output:', errorOutput);
               const results = parseDataFogOutput(output);
+              console.log('Resultados parseados:', results);
               resolve(results);
             } catch (parseError) {
               console.error('Erro ao parsear saída:', parseError);
+              console.log('Output bruto:', output);
               resolve([]);
             }
           });
