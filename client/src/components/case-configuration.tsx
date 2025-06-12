@@ -154,81 +154,55 @@ export default function CaseConfiguration({ onCaseCreated, currentCase }: CaseCo
 
   if (!showForm && currentCase) {
     return (
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-          <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-blue-600" />
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
+              ✓
+            </div>
             <div>
-              <CardTitle className="text-lg">Caso Configurado</CardTitle>
-              <CardDescription>Informações do caso atual</CardDescription>
+              <h4 className="font-medium text-green-900">{currentCase.clientName}</h4>
+              <p className="text-sm text-green-700">
+                {currentCase.incidentType} - {format(new Date(currentCase.incidentDate), "dd/MM/yyyy", { locale: ptBR })}
+              </p>
             </div>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowForm(true)}
+            className="text-green-700 border-green-300 hover:bg-green-50"
           >
-            <Settings className="h-4 w-4 mr-2" />
             Editar
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Cliente</Label>
-              <p className="mt-1 font-medium">{currentCase.clientName}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Data do Incidente</Label>
-              <p className="mt-1 font-medium">
-                {format(new Date(currentCase.incidentDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-              </p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Tipo de Incidente</Label>
-              <p className="mt-1 font-medium">{currentCase.incidentType}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Criado em</Label>
-              <p className="mt-1 font-medium">
-                {format(new Date(currentCase.createdAt!), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-              </p>
-            </div>
-          </div>
-          {currentCase.description && (
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Descrição</Label>
-              <p className="mt-1 text-sm text-gray-700">{currentCase.description}</p>
-            </div>
-          )}
-          {currentCase.observations && (
-            <div>
-              <Label className="text-sm font-medium text-gray-600">Observações</Label>
-              <p className="mt-1 text-sm text-gray-700">{currentCase.observations}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <div className="flex items-center space-x-2">
-          <Settings className="h-5 w-5 text-blue-600" />
-          <div>
-            <CardTitle className="text-lg">
-              {currentCase ? "Editar Caso" : "Configurar Novo Caso"}
-            </CardTitle>
-            <CardDescription>
-              Configure as informações do caso antes de iniciar o processamento
-            </CardDescription>
+    <div>
+      {!currentCase && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">
+              i
+            </div>
+            <p className="text-sm text-blue-800">
+              Para começar, configure as informações básicas do caso que será analisado.
+            </p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      )}
+      
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">
+            {currentCase ? "Editar Caso" : "Configurar Caso"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="clientName">Nome do Cliente *</Label>
@@ -349,7 +323,8 @@ export default function CaseConfiguration({ onCaseCreated, currentCase }: CaseCo
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

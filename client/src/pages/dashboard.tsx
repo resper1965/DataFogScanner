@@ -58,15 +58,68 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {activeSection === "upload" && (
-              <>
-                <CaseConfiguration 
-                  currentCase={currentCase}
-                  onCaseCreated={setCurrentCase}
-                />
-                <UploadSection />
-                <ProcessingDashboard />
-                <ResultsSection />
-              </>
+              <div className="space-y-6">
+                {/* Step 1: Case Configuration */}
+                <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-blue-500">
+                  <div className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                        1
+                      </div>
+                      <h3 className="text-lg font-semibold">Configurar Caso</h3>
+                    </div>
+                    <CaseConfiguration 
+                      currentCase={currentCase}
+                      onCaseCreated={setCurrentCase}
+                    />
+                  </div>
+                </div>
+
+                {/* Step 2: Upload Files - Only show if case is configured */}
+                {currentCase && (
+                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-green-500">
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                          2
+                        </div>
+                        <h3 className="text-lg font-semibold">Upload de Arquivos</h3>
+                      </div>
+                      <UploadSection />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Processing Dashboard - Only show if files uploaded */}
+                {currentCase && (
+                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-yellow-500">
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                          3
+                        </div>
+                        <h3 className="text-lg font-semibold">Processamento</h3>
+                      </div>
+                      <ProcessingDashboard />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Results - Only show if processing started */}
+                {currentCase && (
+                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-purple-500">
+                    <div className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                          4
+                        </div>
+                        <h3 className="text-lg font-semibold">Resultados</h3>
+                      </div>
+                      <ResultsSection />
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
             {activeSection === "dashboard" && <ProcessingDashboard />}
             {activeSection === "search" && <ResultsSection />}
