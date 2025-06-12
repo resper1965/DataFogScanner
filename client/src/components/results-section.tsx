@@ -167,13 +167,36 @@ export default function ResultsSection() {
           </div>
           
           {/* Export Options */}
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t border-border space-y-2">
             <Button 
               onClick={handleExportReport}
               className="w-full bg-gray-600 hover:bg-gray-700 text-white"
             >
               <Download className="mr-2 h-4 w-4" />
-              Exportar Relatório
+              Exportar JSON
+            </Button>
+            <Button 
+              onClick={async () => {
+                try {
+                  const response = await apiRequest("GET", "/api/reports/export/csv");
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.style.display = 'none';
+                  a.href = url;
+                  a.download = 'relatorio-datafog.csv';
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                } catch (error) {
+                  console.error('Erro ao exportar CSV:', error);
+                }
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Exportar CSV
             </Button>
           </div>
         </CardContent>

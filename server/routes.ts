@@ -154,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Export report endpoint
+  // Export report endpoint (JSON)
   app.get("/api/reports/export", async (req, res) => {
     try {
       const detections = await storage.getAllDetections();
@@ -183,6 +183,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(report);
     } catch (error) {
       console.error("Erro ao exportar relatório:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Export report endpoint (CSV)
+  app.get("/api/reports/export/csv", async (req, res) => {
+    try {
+      const detections = await storage.getAllDetections();
+      const files = await storage.getFiles();
+      
+      // CSV header
+      let csvContent = "ID,Tipo,Valor,Arquivo,Nível de Risco,Contexto,Posição,Data de Criação\n";
+      
+      // CSV data
+      detections.forEach(d => {
+        const file = files.find(f => f.id === d.fileId);
+        const csvRow = [
+          d.id,
+          d.type,
+          `"${d.value}"`,
+          `"${file?.originalName || 'Desconhecido'}"`,
+          d.riskLevel,
+          `"${d.context || ''}"`,
+          d.position || '',
+          d.createdAt ? new Date(d.createdAt).toISOString() : ''
+        ].join(',');
+        csvContent += csvRow + '\n';
+      });
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename=relatorio-datafog.csv');
+      res.send('\ufeff' + csvContent); // BOM for Excel UTF-8 support
+    } catch (error) {
+      console.error("Erro ao exportar relatório CSV:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
