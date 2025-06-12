@@ -98,8 +98,8 @@ export default function ReportsSection() {
 
   // Filter detections based on current filters
   const filteredDetections = (detections as Detection[]).filter(detection => {
-    if (filters.riskLevel && detection.riskLevel !== filters.riskLevel) return false;
-    if (filters.detectionType && detection.type !== filters.detectionType) return false;
+    if (filters.riskLevel && filters.riskLevel !== 'all' && detection.riskLevel !== filters.riskLevel) return false;
+    if (filters.detectionType && filters.detectionType !== 'all' && detection.type !== filters.detectionType) return false;
     if (filters.searchTerm && detection.context && !detection.context.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false;
     
     // Date filtering
@@ -133,15 +133,15 @@ export default function ReportsSection() {
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
       .map(([pattern, count]) => ({ pattern, count }))
-  } : statsData ? {
-    totalDetections: statsData.totalDetections,
-    byRiskLevel: statsData.byRiskLevel || {},
-    byType: statsData.byType || {},
-    byDate: Object.entries(statsData.byDate || {}).map(([date, count]) => ({
+  } : (statsData && typeof statsData === 'object') ? {
+    totalDetections: (statsData as any).totalDetections || 0,
+    byRiskLevel: (statsData as any).byRiskLevel || {},
+    byType: (statsData as any).byType || {},
+    byDate: Object.entries((statsData as any).byDate || {}).map(([date, count]) => ({
       date,
       count: count as number
     })).sort((a, b) => a.date.localeCompare(b.date)),
-    topPatterns: Object.entries(statsData.byType || {})
+    topPatterns: Object.entries((statsData as any).byType || {})
       .map(([pattern, count]) => ({ pattern, count: count as number }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5)
@@ -268,7 +268,7 @@ export default function ReportsSection() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="high">Alto</SelectItem>
                   <SelectItem value="medium">Médio</SelectItem>
                   <SelectItem value="low">Baixo</SelectItem>
@@ -284,13 +284,13 @@ export default function ReportsSection() {
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos</SelectItem>
-                  <SelectItem value="cpf">CPF</SelectItem>
-                  <SelectItem value="cnpj">CNPJ</SelectItem>
-                  <SelectItem value="rg">RG</SelectItem>
-                  <SelectItem value="cep">CEP</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="phone">Telefone</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="CPF">CPF</SelectItem>
+                  <SelectItem value="CNPJ">CNPJ</SelectItem>
+                  <SelectItem value="RG">RG</SelectItem>
+                  <SelectItem value="CEP">CEP</SelectItem>
+                  <SelectItem value="EMAIL">Email</SelectItem>
+                  <SelectItem value="PHONE">Telefone</SelectItem>
                 </SelectContent>
               </Select>
             </div>

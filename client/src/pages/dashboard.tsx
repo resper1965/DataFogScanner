@@ -5,6 +5,7 @@ import ProcessingDashboard from "@/components/processing-dashboard";
 import ResultsSection from "@/components/results-section";
 import CaseConfiguration from "@/components/case-configuration";
 import ReportsSection from "@/components/reports-section";
+import SettingsSection from "@/components/settings-section";
 import type { Case } from "@shared/schema";
 import { Bell, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -125,15 +126,7 @@ export default function Dashboard() {
             {activeSection === "dashboard" && <ProcessingDashboard />}
             {activeSection === "search" && <ResultsSection />}
             {activeSection === "reports" && <ReportsSection />}
-            {activeSection === "settings" && (
-              <div className="bg-surface rounded-lg card-shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Configurações</h3>
-                <p className="text-muted-foreground">
-                  Seção de configurações em desenvolvimento. Aqui você poderá 
-                  configurar padrões de detecção e preferências do sistema.
-                </p>
-              </div>
-            )}
+            {activeSection === "settings" && <SettingsSection />}
           </div>
         </main>
       </div>
