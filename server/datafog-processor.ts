@@ -1,9 +1,8 @@
-import { spawn } from "child_process";
-import { storage } from "./storage";
-import { extractZipFiles } from "./file-handler";
-import { getBrazilianPatterns } from "../client/src/lib/brazilian-patterns";
-import path from "path";
-import fs from "fs/promises";
+import { spawn } from 'child_process';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { storage } from './storage';
+import { getBrazilianPatterns } from '../client/src/lib/brazilian-patterns';
 
 interface DetectionResult {
   type: string;
@@ -15,83 +14,39 @@ interface DetectionResult {
   source?: 'regex' | 'semantic' | 'hybrid';
 }
 
-// Batch processing configuration
-const BATCH_SIZE = 3; // Process 3 jobs at a time
-const MAX_CONTENT_LENGTH = 50000; // 50KB chunks for large files
-const PROCESSING_TIMEOUT = 30000; // 30 second timeout per job
-const MAX_FILES_PER_ZIP = 50; // Limit files per ZIP to prevent overload
-
 export async function processFiles(jobIds: number[]): Promise<void> {
-  // Process in batches to avoid memory issues and timeouts
-  for (let i = 0; i < jobIds.length; i += BATCH_SIZE) {
-    const batch = jobIds.slice(i, i + BATCH_SIZE);
-    console.log(`Processando lote ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(jobIds.length/BATCH_SIZE)} (${batch.length} arquivos)`);
-    
-    // Process batch in parallel with timeout protection
-    await Promise.allSettled(
-      batch.map(jobId => 
-        Promise.race([
-          processFileWithDataFog(jobId),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout no processamento')), PROCESSING_TIMEOUT)
-          )
-        ]).catch(error => {
-          console.error(`Erro no processamento do job ${jobId}:`, error);
-          return storage.updateProcessingJobStatus(jobId, 'failed', 0, error.message);
-        })
-      )
-    );
-    
-    // Small delay between batches to prevent resource exhaustion
-    if (i + BATCH_SIZE < jobIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
+  for (const jobId of jobIds) {
+    await processFileWithDataFog(jobId);
   }
 }
 
 async function processFileWithDataFog(jobId: number): Promise<void> {
   try {
     const job = await storage.getProcessingJob(jobId);
-    if (!job) return;
+    if (!job) {
+      throw new Error(`Job ${jobId} não encontrado`);
+    }
+
+    await storage.updateProcessingJobStatus(jobId, 'processing', 10);
 
     const file = await storage.getFile(job.fileId);
-    if (!file) return;
-
-    await storage.updateProcessingJobStatus(jobId, 'processing', 0);
-    await storage.updateFileStatus(file.id, 'processing');
-
-    let filesToProcess = [file.path];
-    
-    // Extract ZIP files if needed
-    if (file.mimeType === 'application/zip' || file.originalName.toLowerCase().endsWith('.zip')) {
-      await storage.updateProcessingJobStatus(jobId, 'processing', 10);
-      const extractedFiles = await extractZipFiles(file.path);
-      
-      // Limit number of files to prevent overload
-      if (extractedFiles.length > MAX_FILES_PER_ZIP) {
-        console.warn(`ZIP contém ${extractedFiles.length} arquivos, limitando a ${MAX_FILES_PER_ZIP}`);
-        filesToProcess = extractedFiles.slice(0, MAX_FILES_PER_ZIP);
-      } else {
-        filesToProcess = extractedFiles;
-      }
+    if (!file) {
+      throw new Error(`Arquivo ${job.fileId} não encontrado`);
     }
+
+    const filePath = file.path;
+    console.log(`Processando arquivo: ${file.originalName}`);
 
     await storage.updateProcessingJobStatus(jobId, 'processing', 30);
 
-    // Process each file
+    // Executar detecção usando DataFog + regex brasileiro
     const allDetections: DetectionResult[] = [];
-    const totalFiles = filesToProcess.length;
     
-    for (let i = 0; i < filesToProcess.length; i++) {
-      const filePath = filesToProcess[i];
-      const progress = 30 + Math.floor((i / totalFiles) * 60);
-      await storage.updateProcessingJobStatus(jobId, 'processing', progress);
+    // Usar DataFog e regex personalizado
+    const detections = await runDataFogDetection(filePath, job.patterns, job.customRegex || undefined);
+    allDetections.push(...detections);
 
-      const detections = await runRegexDetection(filePath, job.patterns, job.customRegex || undefined);
-      allDetections.push(...detections);
-    }
-
-    // Save detections to storage
+    // Salvar detecções no storage
     for (const detection of allDetections) {
       await storage.createDetection({
         fileId: file.id,
@@ -123,40 +78,14 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
   }
 }
 
-async function runRegexDetection(
+async function runDataFogDetection(
   filePath: string, 
   patterns: any, 
   customRegex?: string
 ): Promise<DetectionResult[]> {
-  try {
-    // Read file content for processing
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    
-    // Limit content size for processing
-    const contentToProcess = fileContent.length > MAX_CONTENT_LENGTH 
-      ? fileContent.substring(0, MAX_CONTENT_LENGTH) 
-      : fileContent;
-    
-    // Run Python DataFog script for pattern detection
-    const results = await runPythonDataFogScript(contentToProcess, patterns, customRegex);
-    return results;
-
-  } catch (error) {
-    console.error('Erro no processamento de arquivo:', error);
-    return [];
-  }
-}
-
-async function runPythonDataFogScript(
-  content: string,
-  patterns: any,
-  customRegex?: string
-): Promise<DetectionResult[]> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     try {
-      const brazilianPatterns = getBrazilianPatterns();
-      const scriptContent = createDataFogScript('temp_content', patterns, customRegex, brazilianPatterns, content);
-      
+      const scriptContent = createDataFogScript(filePath, patterns, customRegex);
       const tempScriptPath = path.join(process.cwd(), 'temp_datafog_script.py');
       
       fs.writeFile(tempScriptPath, scriptContent)
@@ -178,13 +107,13 @@ async function runPythonDataFogScript(
 
           const timeout = setTimeout(() => {
             pythonProcess.kill();
-            reject(new Error('Timeout no processamento Python'));
+            resolve([]);
           }, 20000);
 
           pythonProcess.on('close', (code) => {
             clearTimeout(timeout);
             
-            // Clean up temp file
+            // Limpar arquivo temporário
             fs.unlink(tempScriptPath).catch(() => {});
             
             if (code !== 0) {
@@ -223,14 +152,13 @@ async function runPythonDataFogScript(
 function createDataFogScript(
   filePath: string,
   patterns: string[],
-  customRegex: string | undefined,
-  brazilianPatterns: any[],
-  content?: string
+  customRegex?: string
 ): string {
   return `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
 import json
+import re
 from pathlib import Path
 
 try:
@@ -239,8 +167,8 @@ try:
     from docx import Document
     import openpyxl
 except ImportError as e:
-    print(f"Erro ao importar bibliotecas: {e}", file=sys.stderr)
-    sys.exit(1)
+    print(f"Biblioteca não encontrada: {e}", file=sys.stderr)
+    # Continuar com regex manual se DataFog não estiver disponível
 
 def extract_text_from_file(file_path):
     """Extrai texto de diferentes tipos de arquivo"""
@@ -258,7 +186,7 @@ def extract_text_from_file(file_path):
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 return f.read()
     except Exception as e:
-        print(f"Erro ao extrair texto de {file_path}: {e}", file=sys.stderr)
+        print(f"Erro ao extrair texto: {e}", file=sys.stderr)
         return ""
 
 def extract_text_from_pdf(file_path):
@@ -302,93 +230,79 @@ def extract_text_from_excel(file_path):
         print(f"Erro ao ler Excel: {e}", file=sys.stderr)
         return ""
 
-def scan_file_with_datafog(file_path, enabled_patterns):
-    """Usa o DataFog oficial para escanear o arquivo"""
+def scan_with_regex(content, enabled_patterns):
+    """Escaneamento com regex brasileiro"""
     results = []
     
-    try:
-        # Extrair texto do arquivo
-        if file_path == 'temp_content':
-            content = """${content ? content.replace(/"/g, '\\"').replace(/\n/g, '\\n') : ''}"""
-        else:
-            content = extract_text_from_file(file_path)
-        
-        if not content.strip():
-            print("Nenhum conteúdo extraído do arquivo", file=sys.stderr)
-            return results
-        
-        # Usar DataFog para escanear
-        datafog = DataFog()
-        
-        # Executar escaneamento
-        scan_results = datafog.scan(content)
-        
-        # Converter resultados para nosso formato
-        if hasattr(scan_results, 'matches') and scan_results.matches:
-            for match in scan_results.matches:
+    brazilian_patterns = {
+        'cpf': r'\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b',
+        'cnpj': r'\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b',
+        'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
+        'telefone': r'\\b\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}\\b',
+        'cep': r'\\b\\d{5}-?\\d{3}\\b',
+        'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b'
+    }
+    
+    for pattern_name in enabled_patterns:
+        if pattern_name in brazilian_patterns:
+            matches = re.finditer(brazilian_patterns[pattern_name], content, re.IGNORECASE)
+            for match in matches:
+                context_start = max(0, match.start() - 30)
+                context_end = min(len(content), match.end() + 30)
+                context = content[context_start:context_end].strip()
+                
                 results.append({
-                    'type': getattr(match, 'entity_type', 'UNKNOWN').upper(),
-                    'value': getattr(match, 'text', ''),
-                    'context': getattr(match, 'context', content[max(0, getattr(match, 'start', 0)-20):getattr(match, 'end', 0)+20]),
-                    'position': getattr(match, 'start', 0),
+                    'type': pattern_name.upper(),
+                    'value': match.group(),
+                    'context': context,
+                    'position': match.start(),
                     'riskLevel': 'high'
                 })
-        
-        # Se DataFog não encontrou nada, usar regex manual para padrões brasileiros
-        if not results:
-            import re
-            brazilian_patterns = {
-                'cpf': r'\\b\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b',
-                'cnpj': r'\\b\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}\\b',
-                'email': r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b',
-                'telefone': r'\\b\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}\\b',
-                'cep': r'\\b\\d{5}-?\\d{3}\\b',
-                'rg': r'\\b\\d{1,2}\\.\\d{3}\\.\\d{3}-\\d{1}\\b'
-            }
-            
-            for pattern_name in enabled_patterns:
-                if pattern_name in brazilian_patterns:
-                    matches = re.finditer(brazilian_patterns[pattern_name], content, re.IGNORECASE)
-                    for match in matches:
-                        context_start = max(0, match.start() - 30)
-                        context_end = min(len(content), match.end() + 30)
-                        context = content[context_start:context_end].strip()
-                        
-                        results.append({
-                            'type': pattern_name.upper(),
-                            'value': match.group(),
-                            'context': context,
-                            'position': match.start(),
-                            'riskLevel': 'high'
-                        })
-                        
-    except Exception as e:
-        print(f"Erro ao processar arquivo {file_path}: {e}", file=sys.stderr)
-        
+    
     return results
 
-# Executar escaneamento
 def main():
-        high_risk = ['cpf', 'cnpj', 'rg']
-        medium_risk = ['telefone', 'cep']
+    try:
+        file_path = "${filePath}"
+        enabled_patterns = ${JSON.stringify(patterns)}
         
-        if pattern_type in high_risk:
-            return 'high'
-        elif pattern_type in medium_risk:
-            return 'medium'
-        else:
-            return 'low'
-
-# Main execution
-def main():
-    file_path = "${filePath}"
-    patterns = ${JSON.stringify(patterns || ['cpf', 'cnpj', 'email'])}
-    custom_regex = ${customRegex ? `"${customRegex.replace(/"/g, '\\"')}"` : 'None'}
-    
-    scanner = DataFogScanner()
-    results = scanner.scan_file(file_path, patterns, custom_regex)
-    
-    print(json.dumps(results, ensure_ascii=False))
+        # Extrair texto do arquivo
+        content = extract_text_from_file(file_path)
+        
+        if not content.strip():
+            print("[]")
+            return
+            
+        # Tentar usar DataFog primeiro
+        try:
+            datafog = DataFog()
+            scan_results = datafog.scan(content)
+            
+            results = []
+            if hasattr(scan_results, 'matches') and scan_results.matches:
+                for match in scan_results.matches:
+                    results.append({
+                        'type': getattr(match, 'entity_type', 'UNKNOWN').upper(),
+                        'value': getattr(match, 'text', ''),
+                        'context': content[max(0, getattr(match, 'start', 0)-30):getattr(match, 'end', 0)+30],
+                        'position': getattr(match, 'start', 0),
+                        'riskLevel': 'high'
+                    })
+            
+            # Se DataFog não encontrou nada, usar regex
+            if not results:
+                results = scan_with_regex(content, enabled_patterns)
+                
+        except Exception as e:
+            print(f"DataFog não disponível, usando regex: {e}", file=sys.stderr)
+            results = scan_with_regex(content, enabled_patterns)
+        
+        # Imprimir resultados
+        print(json.dumps(results, ensure_ascii=False, indent=2))
+        
+    except Exception as e:
+        print(f"Erro: {e}", file=sys.stderr)
+        print("[]")
 
 if __name__ == "__main__":
     main()
