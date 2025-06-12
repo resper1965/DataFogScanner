@@ -1,35 +1,25 @@
-RELATÓRIO DE CLIENTES - CONFIDENCIAL
+Relatório de Funcionários - Ness Tecnologia
 
-Nome: João Silva Santos
-CPF: 123.456.789-10
+João Silva
+CPF: 123.456.789-00
 RG: 12.345.678-9
-Data Nascimento: 15/03/1985
-Email: joao.silva@exemplo.com.br
-Telefone: (11) 98765-4321
+Email: joao.silva@ness.com.br
+Telefone: (11) 99999-8888
+CEP: 01310-100
 
-Empresa: Silva & Associados Ltda
-CNPJ: 12.345.678/0001-95
-Inscrição Estadual: 123.456.789.123
+Maria Santos
+CPF: 987.654.321-11
+RG: 98.765.432-1
+Email: maria.santos@ness.com.br
+Telefone: (21) 88888-7777
+CEP: 22071-900
 
-Dados Bancários:
-Banco Itaú (341)
-Agência: 1234
-Conta Corrente: 567890-1
-PIX: joao.silva@exemplo.com.br
+CNPJ da Empresa: 12.345.678/0001-90
+Razão Social: Ness Digital Engineering S/A
 
-Endereço:
-Rua das Flores, 123
-CEP: 01234-567
-São Paulo - SP
+Dados de Clientes:
+- Cliente 1: CPF 111.222.333-44, email cliente1@bradesco.com.br
+- Cliente 2: CPF 555.666.777-88, email cliente2@itau.com.br
 
-Cartão de Crédito: 4532 1234 5678 9012
-Validade: 12/25
-CVV: 123
-
-PIS/PASEP: 123.45678.90-1
-Título de Eleitor: 1234.5678.0191
-CNH: 12345678901
-
-Observações:
-Cliente VIP desde 2020
-Limite especial autorizado
+PIS: 123.45678.90-1
+Cartão: 4532 1234 5678 9012
