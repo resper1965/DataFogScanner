@@ -203,7 +203,7 @@ def extract_text_from_pdf(file_path):
             pdf_reader = PyPDF2.PdfReader(file)
             text = ''
             for page in pdf_reader.pages:
-                text += page.extract_text() + '\\n'
+                text += page.extract_text() + '\\\\n'
             return text
     except Exception as e:
         print(f"Erro ao ler PDF: {e}", file=sys.stderr)
@@ -215,7 +215,7 @@ def extract_text_from_docx(file_path):
         doc = Document(file_path)
         text = ''
         for paragraph in doc.paragraphs:
-            text += paragraph.text + '\\n'
+            text += paragraph.text + '\\\\n'
         return text
     except Exception as e:
         print(f"Erro ao ler DOCX: {e}", file=sys.stderr)
@@ -231,7 +231,7 @@ def extract_text_from_excel(file_path):
                 for cell in row:
                     if cell.value:
                         text += str(cell.value) + ' '
-            text += '\\n'
+            text += '\\\\n'
         return text
     except Exception as e:
         print(f"Erro ao ler Excel: {e}", file=sys.stderr)
@@ -318,9 +318,22 @@ if __name__ == "__main__":
 
 function parseDataFogOutput(output: string): DetectionResult[] {
   try {
+    // Remove linhas de erro e pegar apenas o JSON
     const lines = output.trim().split('\n');
-    const jsonLine = lines[lines.length - 1];
-    const results = JSON.parse(jsonLine);
+    let jsonContent = '';
+    
+    // Procurar pelo início do array JSON
+    let jsonStarted = false;
+    for (const line of lines) {
+      if (line.trim().startsWith('[')) {
+        jsonStarted = true;
+      }
+      if (jsonStarted) {
+        jsonContent += line;
+      }
+    }
+    
+    const results = JSON.parse(jsonContent);
     
     return results.map((result: any) => ({
       type: result.type,
@@ -332,6 +345,7 @@ function parseDataFogOutput(output: string): DetectionResult[] {
     }));
   } catch (error) {
     console.error('Erro ao parsear JSON:', error);
+    console.log('Output bruto para debug:', output);
     return [];
   }
 }
