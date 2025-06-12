@@ -393,22 +393,57 @@ export default function ReportsSection() {
             </div>
           </div>
 
-          <div className="flex gap-2 mt-4">
-            <Button onClick={() => {
-              setFilters({});
-              setDateFrom(undefined);
-              setDateTo(undefined);
-            }} variant="outline">
-              Limpar Filtros
-            </Button>
-            <Button onClick={exportToCSV} className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
-            <Button onClick={exportToPDF} variant="outline" className="gap-2">
-              <FileText className="h-4 w-4" />
-              Exportar PDF
-            </Button>
+          <div className="flex flex-col gap-3 mt-4">
+            <div className="flex gap-2">
+              <Button onClick={() => {
+                setFilters({});
+                setDateFrom(undefined);
+                setDateTo(undefined);
+              }} variant="outline">
+                Limpar Filtros
+              </Button>
+              <Button onClick={exportToCSV} className="gap-2">
+                <Download className="h-4 w-4" />
+                Exportar CSV
+              </Button>
+              <Button onClick={exportToPDF} variant="outline" className="gap-2">
+                <FileText className="h-4 w-4" />
+                Exportar PDF
+              </Button>
+            </div>
+            
+            {/* Quick Filter Examples */}
+            <div className="flex flex-wrap gap-2 pt-2 border-t">
+              <span className="text-xs text-muted-foreground self-center">Filtros rápidos:</span>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setFilters(prev => ({ ...prev, emailDomain: 'bradesco.com.br' }))}
+              >
+                Emails Bradesco
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setFilters(prev => ({ ...prev, detectionType: 'CPF' }))}
+              >
+                Apenas CPFs
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setFilters(prev => ({ ...prev, riskLevel: 'high' }))}
+              >
+                Alto Risco
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setFilters(prev => ({ ...prev, contextSearch: 'Gerente' }))}
+              >
+                Buscar "Gerente"
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
