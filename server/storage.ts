@@ -64,7 +64,11 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      createdAt: new Date()
+    };
     this.users.set(id, user);
     return user;
   }
@@ -72,7 +76,8 @@ export class MemStorage implements IStorage {
   async createFile(insertFile: InsertFile): Promise<File> {
     const id = this.currentFileId++;
     const file: File = { 
-      ...insertFile, 
+      ...insertFile,
+      status: insertFile.status || "uploaded",
       id,
       uploadedAt: new Date(),
       processedAt: null
@@ -103,7 +108,9 @@ export class MemStorage implements IStorage {
   async createDetection(insertDetection: InsertDetection): Promise<Detection> {
     const id = this.currentDetectionId++;
     const detection: Detection = { 
-      ...insertDetection, 
+      ...insertDetection,
+      context: insertDetection.context || null,
+      position: insertDetection.position || null,
       id,
       createdAt: new Date()
     };
@@ -122,7 +129,11 @@ export class MemStorage implements IStorage {
   async createProcessingJob(insertJob: InsertProcessingJob): Promise<ProcessingJob> {
     const id = this.currentJobId++;
     const job: ProcessingJob = { 
-      ...insertJob, 
+      ...insertJob,
+      status: insertJob.status || "queued",
+      progress: insertJob.progress || 0,
+      patterns: insertJob.patterns || [],
+      customRegex: insertJob.customRegex || null,
       id,
       startedAt: null,
       completedAt: null,

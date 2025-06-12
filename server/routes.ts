@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFileSchema, insertProcessingJobSchema, insertDetectionSchema } from "@shared/schema";
+import { authenticateUser, registerUser, loginSchema, registerSchema } from "./auth";
 import multer from "multer";
 import path from "path";
 import { processFiles } from "./datafog-processor";
@@ -16,6 +17,70 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = loginSchema.parse(req.body);
+      
+      const user = await authenticateUser(email, password);
+      if (!user) {
+        return res.status(401).json({ message: "Email ou senha inválidos" });
+      }
+
+      // Store user in session
+      req.session.userId = user.id;
+      req.session.user = user;
+
+      res.json({ 
+        message: "Login realizado com sucesso",
+        user: user
+      });
+    } catch (error) {
+      console.error("Erro no login:", error);
+      res.status(400).json({ message: "Dados inválidos" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = registerSchema.parse(req.body);
+      
+      const user = await registerUser(userData);
+      
+      // Store user in session
+      req.session.userId = user.id;
+      req.session.user = user;
+
+      res.status(201).json({ 
+        message: "Usuário criado com sucesso",
+        user: user
+      });
+    } catch (error) {
+      console.error("Erro no registro:", error);
+      if (error instanceof Error && error.message === 'Usuário já existe com este email') {
+        return res.status(409).json({ message: error.message });
+      }
+      res.status(400).json({ message: "Erro ao criar usuário" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro ao fazer logout" });
+      }
+      res.json({ message: "Logout realizado com sucesso" });
+    });
+  });
+
+  app.get("/api/auth/me", (req, res) => {
+    if (req.session.user) {
+      res.json({ user: req.session.user });
+    } else {
+      res.status(401).json({ message: "Não autenticado" });
+    }
+  });
+
   // Upload files endpoint
   app.post("/api/files/upload", upload.array('files', 10), async (req, res) => {
     try {
