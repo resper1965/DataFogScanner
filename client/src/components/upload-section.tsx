@@ -1,17 +1,19 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { CloudUpload, File, X, Search, Brain, Zap } from "lucide-react";
+import { CloudUpload, File, X, Search, Brain, Zap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getBrazilianPatterns } from "@/lib/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import SecurityStatus from "./security-status";
 
 export default function UploadSection() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -164,6 +166,14 @@ export default function UploadSection() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Security Information */}
+          <Alert className="border-blue-200 bg-blue-50">
+            <Shield className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Proteção Automática:</strong> Todos os arquivos são escaneados automaticamente contra malware, ZIP bombs e executáveis perigosos antes do processamento.
+            </AlertDescription>
+          </Alert>
+
           {/* Dropzone */}
           <div
             {...getRootProps()}

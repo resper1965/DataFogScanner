@@ -16,76 +16,113 @@ interface DetectionResult {
   source?: 'regex' | 'semantic' | 'hybrid';
 }
 
+// Batch processing configuration
+const BATCH_SIZE = 3; // Process 3 jobs at a time
+const MAX_CONTENT_LENGTH = 50000; // 50KB chunks for large files
+const PROCESSING_TIMEOUT = 30000; // 30 second timeout per job
+const MAX_FILES_PER_ZIP = 50; // Limit files per ZIP to prevent overload
+
 export async function processFiles(jobIds: number[]): Promise<void> {
-  for (const jobId of jobIds) {
-    try {
-      const job = await storage.getProcessingJob(jobId);
-      if (!job) continue;
-
-      const file = await storage.getFile(job.fileId);
-      if (!file) continue;
-
-      await storage.updateProcessingJobStatus(jobId, 'processing', 0);
-      await storage.updateFileStatus(file.id, 'processing');
-
-      let filesToProcess = [file.path];
-      
-      // Extract ZIP files if needed
-      if (file.mimeType === 'application/zip' || file.originalName.toLowerCase().endsWith('.zip')) {
-        await storage.updateProcessingJobStatus(jobId, 'processing', 10);
-        const extractedFiles = await extractZipFiles(file.path);
-        filesToProcess = extractedFiles;
-      }
-
-      await storage.updateProcessingJobStatus(jobId, 'processing', 30);
-
-      // Process each file
-      const allDetections: DetectionResult[] = [];
-      const totalFiles = filesToProcess.length;
-      
-      for (let i = 0; i < filesToProcess.length; i++) {
-        const filePath = filesToProcess[i];
-        const progress = 30 + Math.floor((i / totalFiles) * 60);
-        await storage.updateProcessingJobStatus(jobId, 'processing', progress);
-
-        const detections = await processFileWithDataFog(filePath, job.patterns, job.customRegex || undefined);
-        allDetections.push(...detections);
-      }
-
-      // Save detections to storage
-      for (const detection of allDetections) {
-        await storage.createDetection({
-          fileId: file.id,
-          type: detection.type,
-          value: detection.value,
-          context: detection.context,
-          riskLevel: detection.riskLevel,
-          position: detection.position
-        });
-      }
-
-      await storage.updateProcessingJobStatus(jobId, 'processing', 95);
-      await storage.completeProcessingJob(jobId);
-      await storage.updateFileStatus(file.id, 'completed');
-
-    } catch (error) {
-      console.error(`Erro no processamento do job ${jobId}:`, error);
-      await storage.updateProcessingJobStatus(
-        jobId, 
-        'failed', 
-        undefined, 
-        error instanceof Error ? error.message : 'Erro desconhecido'
-      );
-      
-      const job = await storage.getProcessingJob(jobId);
-      if (job) {
-        await storage.updateFileStatus(job.fileId, 'error');
-      }
+  // Process in batches to avoid memory issues and timeouts
+  for (let i = 0; i < jobIds.length; i += BATCH_SIZE) {
+    const batch = jobIds.slice(i, i + BATCH_SIZE);
+    console.log(`Processando lote ${Math.floor(i/BATCH_SIZE) + 1}/${Math.ceil(jobIds.length/BATCH_SIZE)} (${batch.length} arquivos)`);
+    
+    // Process batch in parallel with timeout protection
+    await Promise.allSettled(
+      batch.map(jobId => 
+        Promise.race([
+          processFileWithDataFog(jobId),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout no processamento')), PROCESSING_TIMEOUT)
+          )
+        ]).catch(error => {
+          console.error(`Erro no processamento do job ${jobId}:`, error);
+          return storage.updateProcessingJobStatus(jobId, 'failed', 0, error.message);
+        })
+      )
+    );
+    
+    // Small delay between batches to prevent resource exhaustion
+    if (i + BATCH_SIZE < jobIds.length) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
 }
 
-async function processFileWithDataFog(
+async function processFileWithDataFog(jobId: number): Promise<void> {
+  try {
+    const job = await storage.getProcessingJob(jobId);
+    if (!job) return;
+
+    const file = await storage.getFile(job.fileId);
+    if (!file) return;
+
+    await storage.updateProcessingJobStatus(jobId, 'processing', 0);
+    await storage.updateFileStatus(file.id, 'processing');
+
+    let filesToProcess = [file.path];
+    
+    // Extract ZIP files if needed
+    if (file.mimeType === 'application/zip' || file.originalName.toLowerCase().endsWith('.zip')) {
+      await storage.updateProcessingJobStatus(jobId, 'processing', 10);
+      const extractedFiles = await extractZipFiles(file.path);
+      
+      // Limit number of files to prevent overload
+      if (extractedFiles.length > MAX_FILES_PER_ZIP) {
+        console.warn(`ZIP contém ${extractedFiles.length} arquivos, limitando a ${MAX_FILES_PER_ZIP}`);
+        filesToProcess = extractedFiles.slice(0, MAX_FILES_PER_ZIP);
+      } else {
+        filesToProcess = extractedFiles;
+      }
+    }
+
+    await storage.updateProcessingJobStatus(jobId, 'processing', 30);
+
+    // Process each file
+    const allDetections: DetectionResult[] = [];
+    const totalFiles = filesToProcess.length;
+    
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const filePath = filesToProcess[i];
+      const progress = 30 + Math.floor((i / totalFiles) * 60);
+      await storage.updateProcessingJobStatus(jobId, 'processing', progress);
+
+      const detections = await runRegexDetection(filePath, job.patterns, job.customRegex || undefined);
+      allDetections.push(...detections);
+    }
+
+    // Save detections to storage
+    for (const detection of allDetections) {
+      await storage.createDetection({
+        fileId: file.id,
+        type: detection.type,
+        value: detection.value,
+        context: detection.context,
+        riskLevel: detection.riskLevel,
+        position: detection.position
+      });
+    }
+
+    await storage.updateProcessingJobStatus(jobId, 'processing', 95);
+    await storage.completeProcessingJob(jobId);
+    await storage.updateFileStatus(file.id, 'completed');
+
+  } catch (error) {
+    console.error(`Erro no processamento do job ${jobId}:`, error);
+    await storage.updateProcessingJobStatus(
+      jobId, 
+      'failed', 
+      undefined, 
+      error instanceof Error ? error.message : 'Erro desconhecido'
+    );
+    
+    const job = await storage.getProcessingJob(jobId);
+    if (job) {
+      await storage.updateFileStatus(job.fileId, 'error');
+    }
+  }
+async function runRegexDetection(
   filePath: string, 
   patterns: any, 
   customRegex?: string
