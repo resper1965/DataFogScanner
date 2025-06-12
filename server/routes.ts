@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertFileSchema, insertProcessingJobSchema, insertDetectionSchema } from "@shared/schema";
+import { insertFileSchema, insertProcessingJobSchema, insertDetectionSchema, insertCaseSchema } from "@shared/schema";
 import { authenticateUser, registerUser, loginSchema, registerSchema } from "./auth";
 import multer from "multer";
 import path from "path";
@@ -329,6 +329,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao exportar relatório CSV:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Cases API routes
+  app.get("/api/cases", async (req, res) => {
+    try {
+      const cases = await storage.getCases();
+      res.json(cases);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/cases", async (req, res) => {
+    try {
+      const result = insertCaseSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: "Invalid case data", details: result.error.issues });
+      }
+      
+      const newCase = await storage.createCase(result.data);
+      res.status(201).json(newCase);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/cases/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const case_ = await storage.getCase(id);
+      if (!case_) {
+        return res.status(404).json({ error: "Case not found" });
+      }
+      res.json(case_);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/cases/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const result = insertCaseSchema.partial().safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: "Invalid case data", details: result.error.issues });
+      }
+      
+      await storage.updateCase(id, result.data);
+      const updatedCase = await storage.getCase(id);
+      res.json(updatedCase);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

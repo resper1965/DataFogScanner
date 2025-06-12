@@ -141,6 +141,8 @@ export class MemStorage implements IStorage {
     const id = this.currentCaseId++;
     const case_: Case = { 
       ...insertCase,
+      description: insertCase.description || null,
+      observations: insertCase.observations || null,
       id,
       createdAt: new Date(),
       updatedAt: null

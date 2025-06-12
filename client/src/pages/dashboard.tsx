@@ -3,6 +3,8 @@ import Sidebar from "@/components/sidebar";
 import UploadSection from "@/components/upload-section";
 import ProcessingDashboard from "@/components/processing-dashboard";
 import ResultsSection from "@/components/results-section";
+import CaseConfiguration from "@/components/case-configuration";
+import type { Case } from "@shared/schema";
 import { Bell, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
