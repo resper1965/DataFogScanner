@@ -126,7 +126,17 @@ export default function SettingsSection() {
     }
 
     try {
-      await apiRequest('/api/files', { method: 'DELETE' });
+      const response = await fetch('/api/files', { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       await queryClient.invalidateQueries();
       
       toast({
@@ -134,9 +144,10 @@ export default function SettingsSection() {
         description: "Todos os dados foram removidos"
       });
     } catch (error) {
+      console.error('Erro ao limpar dados:', error);
       toast({
         title: "Erro",
-        description: "Erro ao limpar dados",
+        description: `Erro ao limpar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
         variant: "destructive"
       });
     }
@@ -144,14 +155,19 @@ export default function SettingsSection() {
 
   const exportData = async () => {
     try {
-      const detections = await apiRequest('/api/detections');
-      const files = await apiRequest('/api/files');
+      const [detectionsResponse, filesResponse] = await Promise.all([
+        fetch('/api/detections'),
+        fetch('/api/files')
+      ]);
+      
+      const detections = await detectionsResponse.json();
+      const files = await filesResponse.json();
       
       const data = {
         detections,
         files,
         exportDate: new Date().toISOString(),
-        totalDetections: statsData?.totalDetections || 0
+        totalDetections: (statsData as any)?.totalDetections || 0
       };
       
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -167,9 +183,10 @@ export default function SettingsSection() {
         description: "Dados exportados com sucesso"
       });
     } catch (error) {
+      console.error('Erro ao exportar dados:', error);
       toast({
         title: "Erro",
-        description: "Erro ao exportar dados",
+        description: `Erro ao exportar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
         variant: "destructive"
       });
     }
@@ -454,15 +471,15 @@ export default function SettingsSection() {
                   <div className="grid gap-2 text-sm">
                     <div className="flex justify-between">
                       <span>Total de Detecções:</span>
-                      <span className="font-medium">{statsData.totalDetections}</span>
+                      <span className="font-medium">{(statsData as any)?.totalDetections || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total de Arquivos:</span>
-                      <span className="font-medium">{statsData.totalFiles}</span>
+                      <span className="font-medium">{(statsData as any)?.totalFiles || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total de Casos:</span>
-                      <span className="font-medium">{statsData.totalCases}</span>
+                      <span className="font-medium">{(statsData as any)?.totalCases || 0}</span>
                     </div>
                   </div>
                 </div>
