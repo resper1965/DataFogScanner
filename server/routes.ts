@@ -249,6 +249,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create detection endpoint
+  app.post("/api/detections", async (req, res) => {
+    try {
+      const result = insertDetectionSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ error: "Dados de detecção inválidos", details: result.error.issues });
+      }
+      
+      const detection = await storage.createDetection(result.data);
+      res.status(201).json(detection);
+    } catch (error) {
+      console.error("Erro ao criar detecção:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Get detection statistics for reports
   app.get("/api/reports/stats", async (req, res) => {
     try {
