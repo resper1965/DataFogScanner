@@ -8,16 +8,19 @@ import { getRiskLevelColor, getRiskLevelBadgeColor, getRiskLevelText } from "@/l
 import { apiRequest } from "@/lib/queryClient";
 
 export default function ResultsSection() {
-  const { data: detections } = useQuery({
+  const { data: detections = [] } = useQuery({
     queryKey: ["/api/detections"],
+    refetchInterval: 2000,
   });
 
-  const { data: stats } = useQuery({
+  const { data: stats = {} } = useQuery({
     queryKey: ["/api/processing/stats"],
+    refetchInterval: 2000,
   });
 
-  const { data: files } = useQuery({
+  const { data: files = [] } = useQuery({
     queryKey: ["/api/files"],
+    refetchInterval: 2000,
   });
 
   const handleExportReport = async () => {
@@ -37,17 +40,19 @@ export default function ResultsSection() {
     }
   };
 
-  const recentDetections = (detections || []).slice(0, 5);
-  const totalDetections = detections?.length || 0;
-  const highRiskCount = stats?.highRiskDetections || 0;
-  const mediumRiskCount = stats?.mediumRiskDetections || 0;
-  const lowRiskCount = stats?.lowRiskDetections || 0;
+  const recentDetections = detections.slice(0, 5);
+  const totalDetections = detections.length;
+  
+  // Calculate risk counts from actual detections
+  const highRiskCount = detections.filter((d: any) => d.riskLevel === 'high').length;
+  const mediumRiskCount = detections.filter((d: any) => d.riskLevel === 'medium').length;
+  const lowRiskCount = detections.filter((d: any) => d.riskLevel === 'low').length;
 
   const documentTypes = [
-    { name: 'PDF', count: files?.filter((f: any) => f.originalName.toLowerCase().endsWith('.pdf')).length || 0, icon: 'fa-file-pdf', color: 'text-red-500' },
-    { name: 'DOC', count: files?.filter((f: any) => f.originalName.toLowerCase().match(/\.(doc|docx)$/)).length || 0, icon: 'fa-file-word', color: 'text-blue-500' },
-    { name: 'ZIP', count: files?.filter((f: any) => f.originalName.toLowerCase().endsWith('.zip')).length || 0, icon: 'fa-file-archive', color: 'text-yellow-500' },
-    { name: 'TXT', count: files?.filter((f: any) => f.originalName.toLowerCase().endsWith('.txt')).length || 0, icon: 'fa-file-alt', color: 'text-gray-500' },
+    { name: 'PDF', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.pdf')).length, icon: 'fa-file-pdf', color: 'text-red-500' },
+    { name: 'DOC', count: files.filter((f: any) => f.originalName?.toLowerCase().match(/\.(doc|docx)$/)).length, icon: 'fa-file-word', color: 'text-blue-500' },
+    { name: 'ZIP', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.zip')).length, icon: 'fa-file-archive', color: 'text-yellow-500' },
+    { name: 'TXT', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.txt')).length, icon: 'fa-file-alt', color: 'text-gray-500' },
   ];
 
   return (
