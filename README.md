@@ -1,227 +1,202 @@
-# Ness DataFog - Aplicação de Proteção de Dados
+# DataFog PII Detector
 
-Uma aplicação web moderna em português para processamento e detecção de dados sensíveis em documentos brasileiros, desenvolvida pela Ness.
+Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros utilizando DataFog oficial, com interface moderna em português e processamento inteligente.
 
-## Funcionalidades
-
-### 🔒 Detecção de Dados Sensíveis
-- **Documentos Brasileiros**: CPF, CNPJ, RG, Telefone, CEP
-- **Dados Financeiros**: Contas bancárias, cartões de crédito, PIX
-- **Documentos Pessoais**: CNH, Título de eleitor, Cartão SUS
-- **Regex Personalizados**: Padrões customizáveis para necessidades específicas
-
-### 📁 Upload e Processamento
-- **Interface Web**: Upload via drag-and-drop
-- **SFTP**: Monitoramento automático de diretório
-- **Formatos Suportados**: PDF, DOC/DOCX, TXT, ZIP, CSV
-- **Processamento em Lote**: Extração e análise de arquivos ZIP
-
-### 📊 Dashboard em Tempo Real
-- **Status de Processamento**: Acompanhamento em tempo real
-- **Estatísticas**: Distribuição por nível de risco
-- **Visualização**: Detecções por tipo de documento
-- **Progresso**: Barras de progresso para cada arquivo
-
-### 📈 Relatórios e Exportação
-- **Formato JSON**: Relatórios estruturados
-- **Formato CSV**: Compatível com Excel
-- **Filtros**: Por arquivo, tipo de dados, nível de risco
-- **Histórico**: Controle de processamentos anteriores
-
-## Tecnologias
-
-### Frontend
-- **React + TypeScript**: Interface moderna e tipada
-- **Tailwind CSS**: Design system responsivo
-- **Shadcn/UI**: Componentes acessíveis
-- **TanStack Query**: Gerenciamento de estado e cache
-- **Wouter**: Roteamento leve
-
-### Backend
-- **Node.js + Express**: API RESTful
-- **TypeScript**: Tipagem estática
-- **PostgreSQL**: Banco de dados relacional
-- **Drizzle ORM**: Type-safe database queries
-- **Multer**: Upload de arquivos
-
-### Processamento
-- **DataFog Python**: Engine de detecção
-- **Regex Brasileiros**: Padrões otimizados
-- **ZIP Extraction**: Processamento de arquivos compactados
-- **SFTP Monitor**: Monitoramento automático
-
-## Instalação
+## 🚀 Deploy Rápido para VPS
 
 ### Pré-requisitos
+- VPS com Ubuntu 20.04+ (mín. 4GB RAM, 2 CPU)
+- Docker e Docker Compose
+- Chave da OpenAI API
+
+### Instalação
 ```bash
-# Node.js 20+
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# 1. Clonar repositório
+git clone <seu-repositorio>
+cd datafog-pii-detector
 
-# Python 3.11+
-sudo apt-get install python3.11 python3.11-pip
-
-# PostgreSQL
-sudo apt-get install postgresql postgresql-contrib
+# 2. Executar deploy automatizado
+./deploy.sh
 ```
 
-### Configuração do Projeto
+O script irá:
+- Instalar Docker automaticamente
+- Configurar PostgreSQL e Redis
+- Criar arquivos de configuração
+- Iniciar todos os serviços
+
+### Configuração Obrigatória
+Editar `.env`:
 ```bash
-# Clone o repositório
-git clone <repository-url>
-cd ness-datafog
+OPENAI_API_KEY=sk-sua-chave-aqui
+POSTGRES_PASSWORD=senha-segura
+SESSION_SECRET=chave-sessao-secreta
+```
 
-# Instale dependências
-npm install
+## 📋 Funcionalidades
 
-# Configure variáveis de ambiente
-cp .env.example .env
+### 🔍 Detecção de PII Brasileira
+- **CPF**: Validação com dígitos verificadores
+- **CNPJ**: Detecção de empresas brasileiras
+- **RG**: Números de identidade regionais
+- **CEP**: Códigos postais brasileiros
+- **Telefones**: Celulares e fixos nacionais
+- **Email**: Endereços eletrônicos
+- **Endereços**: Logradouros completos
 
-# Configure o banco de dados
-npm run db:push
+### 🧠 Processamento Inteligente
+- **Regex Avançado**: Padrões específicos brasileiros
+- **IA Semântica**: Validação contextual com OpenAI
+- **Híbrido**: Combina ambas as abordagens
+- **Redução de Falsos Positivos**: Análise de contexto
 
-# Inicie o servidor
+### 📁 Suporte a Arquivos
+- **Formatos**: TXT, PDF, DOCX, XLSX
+- **ZIP**: Extração automática de compactados
+- **Múltiplos**: Upload simultâneo
+- **Segurança**: Escaneamento antivírus (ClamAV)
+
+### 🏢 Gestão de Casos
+- **Informações do Cliente**: Nome, empresa, contato
+- **Detalhes do Incidente**: Data, tipo, observações
+- **Organização**: Agrupamento por projeto
+- **Histórico**: Rastreamento completo
+
+### 📊 Dashboard em Tempo Real
+- **Status de Processamento**: Progresso visual
+- **Estatísticas**: Contadores de detecções
+- **Resultados Detalhados**: Contexto e posição
+- **Classificação de Risco**: Alto, médio, baixo
+
+## 🛠️ Arquitetura
+
+### Stack Tecnológico
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **Backend**: Node.js + Express + TypeScript
+- **Banco**: PostgreSQL com Drizzle ORM
+- **Cache**: Redis para sessões
+- **IA**: OpenAI GPT-4o para análise semântica
+- **PII Detection**: DataFog Python oficial
+- **Segurança**: ClamAV antivírus
+
+### Fluxo de Processamento
+```
+Upload → Validação → Extração → Regex → IA → Resultados
+```
+
+1. **Upload**: Validação de tipos e tamanhos
+2. **Segurança**: Scan antivírus automático
+3. **Extração**: Texto de PDFs/DOCs
+4. **Detecção**: Regex + DataFog + OpenAI
+5. **Classificação**: Análise de risco contextual
+6. **Armazenamento**: Banco PostgreSQL
+
+## 🔧 Comandos Úteis
+
+### Docker
+```bash
+# Ver logs
+docker-compose logs -f app
+
+# Parar sistema
+docker-compose down
+
+# Reiniciar aplicação
+docker-compose restart app
+
+# Backup banco
+docker-compose exec postgres pg_dump -U datafog_user datafog > backup.sql
+```
+
+### Desenvolvimento
+```bash
+# Modo desenvolvimento
 npm run dev
+
+# Build para produção
+npm run build
+
+# Migrações banco
+npm run db:push
 ```
 
-### Configuração SFTP (Opcional)
-```bash
-# Criar estrutura de diretórios
-sudo mkdir -p /home/datafog/uploads/sftp/{incoming,processing,processed}
-sudo mkdir -p /home/datafog/exports/{csv,json}
+## 📈 Otimização para Alto Volume
 
-# Configurar usuário SFTP
-sudo useradd -m -s /bin/bash datafog-sftp
-sudo chown -R datafog-sftp:datafog-sftp /home/datafog/
+### Configurações Recomendadas
+```env
+# Processamento
+MAX_CONCURRENT_JOBS=10
+PROCESSING_TIMEOUT_MS=300000
 
-# Ver SFTP_SETUP.md para configuração completa
+# Rate Limiting
+RATE_LIMIT_MAX_REQUESTS=500
+MAX_FILE_SIZE=1073741824  # 1GB
+
+# Pool de Conexões
+DB_POOL_SIZE=20
 ```
 
-## Uso
+### Scaling
+- **Horizontal**: Múltiplas instâncias da aplicação
+- **Load Balancer**: Nginx com SSL
+- **Cache**: Redis distribuído
+- **Storage**: Volume persistente
 
-### Upload via Interface Web
-1. Acesse a aplicação
-2. Selecione "Upload de Arquivos"
-3. Arraste arquivos ou clique para selecionar
-4. Configure padrões de detecção
-5. Clique em "Iniciar Processamento"
+## 🔒 Segurança
 
-### Upload via SFTP
-1. Configure credenciais SFTP
-2. Envie arquivos ZIP para `/uploads/sftp/incoming/`
-3. O sistema processa automaticamente
-4. Resultados disponíveis no dashboard
+### Medidas Implementadas
+- **Antivírus**: ClamAV integrado
+- **Validação**: Tipos de arquivo seguros
+- **Rate Limiting**: Proteção contra abuso
+- **Sessões**: Autenticação segura
+- **HTTPS**: SSL/TLS em produção
+- **Firewall**: Portas específicas
 
-### Visualização de Resultados
-1. Acesse "Buscar Dados" ou "Dashboard"
-2. Visualize detecções por nível de risco
-3. Filtre por tipo de documento
-4. Exporte relatórios em JSON/CSV
+### Conformidade
+- **LGPD**: Processamento local de dados
+- **ISO 27001**: Práticas de segurança
+- **SOC 2**: Controles de acesso
 
-## Padrões de Detecção
+## 📞 Suporte
 
-### Documentos Pessoais
-- **CPF**: Formato XXX.XXX.XXX-XX ou 11 dígitos
-- **CNPJ**: Formato XX.XXX.XXX/XXXX-XX ou 14 dígitos
-- **RG**: Diversos formatos estaduais
-- **Telefone**: Celular e fixo brasileiro
-
-### Documentos Financeiros
-- **Conta Bancária**: Números de conta
-- **Agência Bancária**: Códigos de agência
-- **Cartão de Crédito**: 16 dígitos formatados
-
-### Documentos Governamentais
-- **CNH**: Carteira Nacional de Habilitação
-- **Título de Eleitor**: 12 dígitos
-- **Cartão SUS**: 15 dígitos
-- **PIS/PASEP**: Formato XXX.XXXXX.XX-X
-
-## API Endpoints
-
-### Upload
-- `POST /api/files/upload` - Upload de arquivos
-- `GET /api/files` - Listar arquivos
-
-### Processamento
-- `POST /api/processing/start` - Iniciar processamento
-- `GET /api/processing/jobs` - Status dos jobs
-- `GET /api/processing/stats` - Estatísticas
-
-### Resultados
-- `GET /api/detections` - Listar detecções
-- `GET /api/reports/export` - Exportar JSON
-- `GET /api/reports/export/csv` - Exportar CSV
-
-## Configuração de Desenvolvimento
-
-### Estrutura do Projeto
-```
-├── client/           # Frontend React
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── lib/
-├── server/           # Backend Node.js
-│   ├── routes.ts
-│   ├── storage.ts
-│   └── datafog-processor.ts
-├── shared/           # Tipos compartilhados
-│   └── schema.ts
-└── docs/            # Documentação
-```
-
-### Scripts Disponíveis
-```bash
-npm run dev          # Servidor de desenvolvimento
-npm run build        # Build de produção
-npm run db:push      # Atualizar schema do banco
-npm run lint         # Verificar código
-npm run test         # Executar testes
-```
-
-## Segurança
-
-### Proteção de Dados
-- Criptografia de dados sensíveis
-- Logs de auditoria
-- Acesso controlado via SFTP
-- Isolamento de processos
-
-### Compliance
-- LGPD - Lei Geral de Proteção de Dados
-- Anonimização de dados sensíveis
-- Relatórios de conformidade
-- Controle de retenção
-
-## Suporte
-
-### Logs
-- Aplicação: Console do browser
-- Servidor: `npm run dev` logs
-- SFTP: `/var/log/datafog/`
-- Processamento: Logs em tempo real
+### Logs e Monitoramento
+- **Health Check**: `/api/health`
+- **Logs Estruturados**: JSON format
+- **Métricas**: CPU, memória, disco
+- **Alertas**: Falhas críticas
 
 ### Troubleshooting
-1. Verifique logs do servidor
-2. Confirme configuração do banco
-3. Valide permissões SFTP
-4. Teste conectividade Python
+```bash
+# Status dos serviços
+docker-compose ps
 
-## Contribuição
+# Verificar conectividade
+curl http://localhost:5000/api/health
 
-### Padrões de Código
-- TypeScript estrito
-- ESLint + Prettier
-- Commits semânticos
-- Testes unitários
+# Logs detalhados
+docker-compose logs --tail=100 app
+```
 
-### Workflow
-1. Fork do repositório
-2. Branch para feature
-3. Implementação + testes
-4. Pull request com descrição
+## 🌟 Diferenciais
+
+### Interface Brasileira
+- **Português**: Idioma nativo completo
+- **UX Otimizada**: Fluxo intuitivo
+- **Responsiva**: Mobile e desktop
+- **Acessível**: WCAG 2.1 compliant
+
+### Performance
+- **Processing**: DataFog oficial otimizado
+- **Caching**: Redis para velocidade
+- **Async**: Processamento não-bloqueante
+- **Streaming**: Upload progressivo
+
+### Escalabilidade
+- **Microserviços**: Arquitetura modular
+- **Docker**: Deploy consistente
+- **Load Balancing**: Distribuição automática
+- **Monitoramento**: Observabilidade completa
 
 ---
 
-Desenvolvido com ❤️ pela **Ness** para proteção de dados brasileiros.
+**Desenvolvido especificamente para o mercado brasileiro com foco em dados sensíveis locais e conformidade com LGPD.**
