@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import { storage } from "./storage";
 import { extractZipFiles } from "./file-handler";
 import { getBrazilianPatterns } from "../client/src/lib/brazilian-patterns";
+import { semanticClassifier, type RegexCandidate } from "./semantic-classifier";
 import path from "path";
 import fs from "fs/promises";
 
@@ -11,6 +12,8 @@ interface DetectionResult {
   context: string;
   position: number;
   riskLevel: 'high' | 'medium' | 'low';
+  confidence?: number;
+  source?: 'regex' | 'semantic' | 'hybrid';
 }
 
 export async function processFiles(jobIds: number[]): Promise<void> {
@@ -45,7 +48,7 @@ export async function processFiles(jobIds: number[]): Promise<void> {
         const progress = 30 + Math.floor((i / totalFiles) * 60);
         await storage.updateProcessingJobStatus(jobId, 'processing', progress);
 
-        const detections = await processFileWithDataFog(filePath, job.patterns, job.customRegex);
+        const detections = await processFileWithDataFog(filePath, job.patterns, job.customRegex || undefined);
         allDetections.push(...detections);
       }
 
@@ -87,17 +90,57 @@ async function processFileWithDataFog(
   patterns: any, 
   customRegex?: string
 ): Promise<DetectionResult[]> {
+  try {
+    // Read file content for processing
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    
+    // First, run regex-based detection
+    const regexResults = await runRegexDetection(fileContent, patterns, customRegex);
+    
+    // Convert regex results to RegexCandidate format
+    const regexCandidates: RegexCandidate[] = regexResults.map(result => ({
+      type: result.type,
+      value: result.value,
+      context: result.context,
+      position: result.position,
+      riskLevel: result.riskLevel
+    }));
+
+    // Apply semantic classification to improve accuracy
+    const semanticResults = await semanticClassifier.classifyText(fileContent, regexCandidates);
+    
+    // Convert semantic results back to DetectionResult format
+    return semanticResults.map(result => ({
+      type: result.type,
+      value: result.value,
+      context: result.context,
+      position: result.position,
+      riskLevel: result.riskLevel,
+      confidence: result.confidence,
+      source: result.source
+    }));
+
+  } catch (error) {
+    console.error('Erro no processamento híbrido:', error);
+    // Fallback to regex-only processing
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    return await runRegexDetection(fileContent, patterns, customRegex);
+  }
+}
+
+async function runRegexDetection(
+  content: string,
+  patterns: any,
+  customRegex?: string
+): Promise<DetectionResult[]> {
   return new Promise((resolve, reject) => {
     try {
-      // Create Python script content
       const brazilianPatterns = getBrazilianPatterns();
-      const scriptContent = createDataFogScript(filePath, patterns, customRegex, brazilianPatterns);
+      const scriptContent = createDataFogScript('temp_content', patterns, customRegex, brazilianPatterns, content);
       
-      // Write temporary Python script
       const tempScriptPath = path.join(process.cwd(), 'temp_datafog_script.py');
       
       fs.writeFile(tempScriptPath, scriptContent).then(() => {
-        // Execute Python script
         const pythonProcess = spawn('python3', [tempScriptPath], {
           stdio: ['pipe', 'pipe', 'pipe']
         });
@@ -114,7 +157,6 @@ async function processFileWithDataFog(
         });
 
         pythonProcess.on('close', async (code) => {
-          // Clean up temporary script
           try {
             await fs.unlink(tempScriptPath);
           } catch (e) {
@@ -149,7 +191,8 @@ function createDataFogScript(
   filePath: string, 
   patterns: any, 
   customRegex?: string,
-  brazilianPatterns?: any
+  brazilianPatterns?: any,
+  content?: string
 ): string {
   return `
 import json
