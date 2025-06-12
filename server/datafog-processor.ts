@@ -28,7 +28,9 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
       throw new Error(`Job ${jobId} não encontrado`);
     }
 
-    await storage.updateProcessingJobStatus(jobId, 'processing', 10);
+    // Inicialização - 5%
+    await storage.updateProcessingJobStatus(jobId, 'processing', 5);
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     const file = await storage.getFile(job.fileId);
     if (!file) {
@@ -38,9 +40,14 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
     const filePath = file.path;
     console.log(`Processando arquivo: ${file.originalName} (${file.mimeType})`);
 
-    await storage.updateProcessingJobStatus(jobId, 'processing', 30);
+    // Preparação para extração - 15%
+    await storage.updateProcessingJobStatus(jobId, 'processing', 15);
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Extrair texto usando o novo extrator multiformat
+    console.log(`Iniciando extração de texto...`);
+    await storage.updateProcessingJobStatus(jobId, 'processing', 25);
+    
     const extractionResult = await fileTextExtractor.extractText(filePath, file.mimeType);
     
     if (!extractionResult.success) {
@@ -49,19 +56,36 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
 
     console.log(`Texto extraído: ${extractionResult.text.length} caracteres`);
     
-    await storage.updateProcessingJobStatus(jobId, 'processing', 50);
+    // Extração concluída - 40%
+    await storage.updateProcessingJobStatus(jobId, 'processing', 40);
+    await new Promise(resolve => setTimeout(resolve, 400));
 
     // Executar detecção de dados brasileiros no texto extraído
     const allDetections: DetectionResult[] = [];
+    
+    // Preparando análise de dados - 50%
+    console.log(`Iniciando análise de dados sensíveis...`);
+    await storage.updateProcessingJobStatus(jobId, 'processing', 50);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // Análise de dados - 60%
+    await storage.updateProcessingJobStatus(jobId, 'processing', 60);
     
     const detections = await runBrazilianDataDetection(extractionResult.text, job.fileId);
     allDetections.push(...detections);
 
     console.log(`Detecções encontradas: ${allDetections.length}`);
     
+    // Detecção concluída - 75%
+    await storage.updateProcessingJobStatus(jobId, 'processing', 75);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     // Salvar detecções no storage
-    for (const detection of allDetections) {
-      console.log(`Salvando detecção: ${detection.type} - ${detection.value}`);
+    const totalDetections = allDetections.length;
+    for (let i = 0; i < allDetections.length; i++) {
+      const detection = allDetections[i];
+      console.log(`Salvando detecção ${i + 1}/${totalDetections}: ${detection.type} - ${detection.value}`);
+      
       await storage.createDetection({
         fileId: file.id,
         type: detection.type,
@@ -70,8 +94,13 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
         riskLevel: detection.riskLevel,
         position: detection.position
       });
+
+      // Atualizar progresso durante salvamento (75% a 90%)
+      const saveProgress = 75 + Math.floor((i / totalDetections) * 15);
+      await storage.updateProcessingJobStatus(jobId, 'processing', saveProgress);
     }
 
+    // Finalizando processamento - 95%
     await storage.updateProcessingJobStatus(jobId, 'processing', 95);
     await storage.completeProcessingJob(jobId);
     await storage.updateFileStatus(file.id, 'completed');

@@ -58,6 +58,19 @@ export default function ProcessingDashboard() {
     }
   };
 
+  const getProgressMessage = (progress: number) => {
+    if (progress <= 5) return "Iniciando processamento...";
+    if (progress <= 15) return "Preparando extração de dados...";
+    if (progress <= 25) return "Extraindo texto do documento...";
+    if (progress <= 40) return "Analisando conteúdo extraído...";
+    if (progress <= 50) return "Preparando análise de dados sensíveis...";
+    if (progress <= 60) return "Executando detecção de padrões...";
+    if (progress <= 75) return "Identificando dados sensíveis...";
+    if (progress <= 90) return "Salvando detecções encontradas...";
+    if (progress <= 95) return "Finalizando processamento...";
+    return "Concluindo análise...";
+  };
+
   const processingFiles = jobs || [];
   const isProcessing = processingFiles.some((job: any) => job.status === 'processing');
 
@@ -144,8 +157,15 @@ export default function ProcessingDashboard() {
                       </span>
                     </div>
                   </div>
-                  {/* Progress Bar */}
-                  <Progress value={job.progress || 0} className="w-full" />
+                  {/* Progress Bar with detailed message */}
+                  <div className="space-y-2">
+                    <Progress value={job.progress || 0} className="w-full" />
+                    {job.status === 'processing' && (
+                      <p className="text-sm text-blue-600 font-medium">
+                        {getProgressMessage(job.progress || 0)}
+                      </p>
+                    )}
+                  </div>
                   {job.errorMessage && (
                     <p className="text-sm text-red-600 mt-2">{job.errorMessage}</p>
                   )}
