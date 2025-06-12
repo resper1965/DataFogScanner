@@ -1,42 +1,62 @@
 #!/bin/bash
 
-# Script para conectar ao repositório específico do usuário
-echo "=== Conectando ao repositório PIIDetector ==="
+echo "🔗 Conectando PII Detector n.CrisisOps ao GitHub"
+echo "================================================"
 
-# Colors
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-print_step() {
-    echo -e "${GREEN}[STEP]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Remove remote origin se existir
-if git remote | grep -q "origin"; then
-    print_step "Removendo remote origin existente..."
-    git remote remove origin
+# Verificar se GitHub CLI está instalado
+if ! command -v gh &> /dev/null; then
+    echo "📦 Instalando GitHub CLI..."
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 2>/dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update && sudo apt install -y gh
 fi
 
-# Adiciona o remote correto
-print_step "Adicionando remote origin..."
-git remote add origin https://github.com/resper1965/PIIDetector.git
+echo "🔐 Para autenticar no GitHub:"
+echo "1. Vá para: https://github.com/settings/tokens"
+echo "2. Crie um Personal Access Token com permissões: repo, workflow"
+echo "3. Cole o token quando solicitado"
+echo ""
 
-# Verifica se o remote foi adicionado
-print_step "Verificando remote..."
-git remote -v
+read -p "Pressione Enter para continuar com a autenticação..."
 
-# Configura branch main
-print_step "Configurando branch main..."
-git branch -M main
+# Autenticar no GitHub
+gh auth login --with-token
 
-# Força o push inicial
-print_step "Enviando código para o repositório..."
-git push -u origin main --force
+echo ""
+echo "📝 Criando repositório no GitHub..."
 
-print_step "Repositório conectado com sucesso!"
-echo "URL: https://github.com/resper1965/PIIDetector"
+# Criar repositório
+gh repo create pii-detector-n-crisisops \
+  --private \
+  --description "Sistema de detecção de dados pessoais brasileiros - n.CrisisOps" \
+  --clone=false
+
+if [ $? -eq 0 ]; then
+    echo "✅ Repositório criado com sucesso!"
+    
+    # Obter username
+    USERNAME=$(gh api user --jq .login)
+    
+    echo ""
+    echo "🎯 Próximos passos no Replit:"
+    echo "1. No painel lateral esquerdo, clique no ícone Git"
+    echo "2. Se aparecer 'Connect to GitHub', clique e autorize"
+    echo "3. Use este repositório: https://github.com/$USERNAME/pii-detector-n-crisisops"
+    echo ""
+    echo "📋 Ou execute manualmente:"
+    echo "git remote set-url origin https://github.com/$USERNAME/pii-detector-n-crisisops.git"
+    echo "git push -u origin main"
+    
+else
+    echo "❌ Erro ao criar repositório. Verifique se:"
+    echo "- Você tem permissões suficientes"
+    echo "- O nome do repositório não existe"
+    echo "- O token tem as permissões corretas"
+fi
+
+echo ""
+echo "💡 Alternativa via interface Replit:"
+echo "1. Settings → Connected Services → Connect GitHub"
+echo "2. Version Control → Create Git repository"
+echo "3. Connect to GitHub repository"
+echo "4. Nome: pii-detector-n-crisisops"

@@ -1,54 +1,101 @@
-# Sincronizar Replit com GitHub
+# Sincronização Direta Replit ↔ GitHub
 
-## Método Integrado do Replit
+## Método 1: Via Interface Replit (Direto)
 
-### 1. Conectar repositório GitHub
-1. No Replit, clique no ícone de **controle de versão** (lado esquerdo)
-2. Clique em **"Connect to GitHub"**
-3. Autorize o Replit a acessar sua conta GitHub
-4. Selecione o repositório: `resper1965/PIIDetector`
+### 1. Conectar GitHub ao Replit
+1. **Sidebar esquerda** → Clique no ícone **Git** (ou Version Control)
+2. Se não aparece opção de conectar:
+   - Vá em **Settings** (canto superior direito)
+   - **Connected Services** → **Connect GitHub**
+   - Autorize o Replit a acessar sua conta GitHub
 
-### 2. Configurar sincronização
-1. Após conectar, clique em **"Create Repl from repo"** ou **"Import from GitHub"**
-2. Ou use **"Push to GitHub"** se já estiver trabalhando no projeto
+### 2. Criar Repositório Diretamente
+1. No painel Git do Replit, clique **"Create a Git repository"**
+2. Escolha **"Connect to GitHub repository"**
+3. Configure:
+   - **Name**: `pii-detector-n-crisisops`
+   - **Description**: `Sistema de detecção de dados pessoais brasileiros - n.CrisisOps`
+   - **Visibility**: Private (recomendado)
+4. Clique **"Create repository"**
 
-### 3. Sincronização contínua
-- Use o painel de controle de versão para commits
-- Clique em **"Commit & Push"** para enviar mudanças
-- Use **"Pull"** para receber atualizações do GitHub
+### 3. Commit Inicial Automático
+O Replit fará automaticamente:
+- Commit de todos os arquivos atuais
+- Push para o repositório GitHub
+- Configuração do remote origin
 
-## Método Manual Alternativo
+### 4. Commits Futuros
+Sempre que modificar algo:
+1. **Git panel** → **Stage all changes**
+2. **Commit message**: "feat: descrição da mudança"
+3. **Commit & Push**
 
-### 1. Via interface web do GitHub
-1. Acesse: https://github.com/resper1965/PIIDetector
-2. Clique em **"Add file"** → **"Upload files"**
-3. Arraste arquivos modificados do Replit
-4. Faça commit das mudanças
+## Método 2: GitHub CLI no Replit
 
-### 2. Usando GitHub Codespaces
-1. No repositório GitHub, clique em **"Code"** → **"Codespaces"**
-2. Crie um novo Codespace
-3. Copie arquivos do Replit para o Codespace
-4. Use git normalmente no Codespace
+Se a interface não funcionar:
 
-## Arquivos para sincronizar
-
-Principais arquivos que devem estar sincronizados:
-- `client/` - Frontend completo
-- `server/` - Backend com DataFog
-- `shared/` - Schemas
-- `package.json` - Dependências
-- `docker-compose.yml` - Deploy
-- `README.md` - Documentação
-- Scripts: `deploy.sh`, `setup-git.sh`
-
-## Deploy após sincronização
-
-Uma vez sincronizado, o deploy em VPS funciona com:
 ```bash
-git clone https://github.com/resper1965/PIIDetector.git
-cd PIIDetector
-./deploy.sh
+# Instalar GitHub CLI
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 2>/dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt update && sudo apt install -y gh
+
+# Autenticar (usar Personal Access Token)
+gh auth login --with-token
+
+# Criar repositório e sincronizar
+gh repo create pii-detector-n-crisisops \
+  --private \
+  --description "Sistema de detecção de dados pessoais brasileiros - n.CrisisOps" \
+  --clone=false
+
+# Configurar remote (se necessário limpar Git)
+rm -rf .git
+git init
+git add .
+git commit -m "feat: sistema PII Detector n.CrisisOps completo"
+git branch -M main
+git remote add origin https://github.com/$(gh api user --jq .login)/pii-detector-n-crisisops.git
+git push -u origin main
 ```
 
-O sistema DataFog PII Detector estará pronto para processamento em larga escala.
+## Método 3: Import Existing Repository
+
+Se você já tem um repositório:
+
+1. **Replit** → **Create Repl** → **Import from GitHub**
+2. Cole a URL: `https://github.com/SEU_USUARIO/pii-detector-n-crisisops`
+3. O Replit sincronizará automaticamente
+
+## Status Atual do Projeto
+
+✅ **Arquivos Prontos para Sync**:
+- Frontend React completo
+- Backend Node.js funcional  
+- Database schema configurado
+- Docker setup completo
+- Documentação detalhada
+
+✅ **Funcionalidades Testadas**:
+- Upload e processamento de arquivos
+- Detecção de dados brasileiros
+- Filtros avançados @ness.com.br
+- Sistema de relatórios
+- Configurações operacionais
+
+## Pós-Sincronização
+
+### Deploy Imediato:
+```bash
+git clone https://github.com/SEU_USUARIO/pii-detector-n-crisisops.git
+cd pii-detector-n-crisisops
+docker-compose up -d
+```
+
+### Configuração Mínima:
+```env
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+OPENAI_API_KEY=sk-... # Opcional
+```
+
+O sistema está 100% pronto para sincronização e uso empresarial!
