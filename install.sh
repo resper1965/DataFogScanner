@@ -346,22 +346,40 @@ EOF
 
 # Clonar e configurar aplicação
 setup_application() {
-    log "Configurando aplicação..."
+    log "Clonando código da aplicação..."
     
     sudo -u piidetector bash << 'EOF'
 cd /home/piidetector/pii-detector
 
-# Verificar se já existe código
+# Clonar repositório do GitHub
 if [ ! -f "package.json" ]; then
-    echo "⚠️  Código da aplicação não encontrado."
-    echo "📋 Próximos passos:"
-    echo "   1. Faça upload do código da aplicação para /home/piidetector/pii-detector"
-    echo "   2. Execute: npm install"
-    echo "   3. Execute: npm run db:push"
-    echo "   4. Execute: pm2 start ecosystem.config.js"
+    echo "📥 Baixando código da aplicação..."
+    git clone https://github.com/resper1965/DataFogScanner.git .
     
-    # Criar exemplo de ecosystem.config.js
-    cat > ecosystem.config.js << 'EOE'
+    if [ -f "package.json" ]; then
+        echo "✅ Código baixado com sucesso"
+        
+        # Instalar dependências
+        echo "📦 Instalando dependências..."
+        npm install --production
+        
+        # Executar migrações do banco
+        echo "🗄️  Configurando banco de dados..."
+        npm run db:push
+        
+    else
+        echo "❌ Erro ao baixar código da aplicação"
+        echo "📋 Alternativa manual:"
+        echo "   1. git clone https://github.com/resper1965/DataFogScanner.git ."
+        echo "   2. npm install"
+        echo "   3. npm run db:push"
+    fi
+else
+    echo "✅ Código da aplicação já existe"
+fi
+
+# Criar arquivo de configuração PM2
+cat > ecosystem.config.js << 'EOE'
 module.exports = {
   apps: [{
     name: 'pii-detector',
@@ -376,13 +394,14 @@ module.exports = {
     log_file: '/home/piidetector/logs/app.log',
     error_file: '/home/piidetector/logs/error.log',
     out_file: '/home/piidetector/logs/out.log',
-    env_file: '/home/piidetector/config/.env'
+    env_file: '/home/piidetector/config/.env',
+    max_restarts: 10,
+    min_uptime: '30s',
+    max_memory_restart: '1G'
   }]
 };
 EOE
-else
-    echo "✅ Código da aplicação encontrado"
-fi
+
 EOF
     
     log "Aplicação configurada"
@@ -448,6 +467,30 @@ EOF
     log "Scripts utilitários criados"
 }
 
+# Iniciar aplicação
+start_application() {
+    log "Iniciando aplicação..."
+    
+    sudo -u piidetector bash << 'EOF'
+cd /home/piidetector/pii-detector
+
+if [ -f "package.json" ]; then
+    echo "🚀 Iniciando aplicação com PM2..."
+    pm2 start ecosystem.config.js
+    pm2 save
+    
+    # Configurar PM2 para inicialização automática
+    pm2 startup systemd -u piidetector --hp /home/piidetector
+    
+    echo "✅ Aplicação iniciada e configurada para auto-start"
+else
+    echo "⚠️  Aplicação não pode ser iniciada - código não encontrado"
+fi
+EOF
+    
+    log "Aplicação configurada para inicialização"
+}
+
 # Função principal
 main() {
     detect_os
@@ -464,29 +507,35 @@ main() {
     create_app_config
     setup_application
     create_utility_scripts
+    start_application
     
     echo ""
     echo -e "${GREEN}================================================================="
     echo "✅ INSTALAÇÃO CONCLUÍDA COM SUCESSO!"
     echo -e "=================================================================${NC}"
     echo ""
-    echo -e "${BLUE}📋 Informações importantes:${NC}"
-    echo "  • Usuário da aplicação: piidetector"
+    echo -e "${BLUE}📋 Sistema instalado:${NC}"
+    echo "  • Aplicação: PII Detector n.CrisisOps"
+    echo "  • Usuário: piidetector"
     echo "  • Diretório: /home/piidetector"
+    echo "  • Repositório: https://github.com/resper1965/DataFogScanner.git"
+    echo ""
+    echo -e "${GREEN}🌐 Acessos:${NC}"
+    echo "  • Web: http://$(hostname -I | awk '{print $1}')"
     echo "  • Configuração: /home/piidetector/config/.env"
     echo "  • Logs: /home/piidetector/logs/"
     echo ""
-    echo -e "${YELLOW}🔧 Próximos passos:${NC}"
-    echo "  1. Fazer upload do código da aplicação"
-    echo "  2. Configurar OpenAI API key (opcional)"
-    echo "  3. Executar aplicação"
+    echo -e "${YELLOW}🔧 Comandos úteis:${NC}"
+    echo "  • Verificar: su - piidetector && ./check-system.sh"
+    echo "  • Backup: su - piidetector && ./backup.sh"
+    echo "  • Logs: tail -f /home/piidetector/logs/app.log"
+    echo "  • PM2: pm2 list, pm2 restart pii-detector"
     echo ""
-    echo -e "${GREEN}📝 Comandos úteis:${NC}"
-    echo "  • Verificar sistema: su - piidetector && ./check-system.sh"
-    echo "  • Fazer backup: su - piidetector && ./backup.sh"
-    echo "  • Ver logs: tail -f /home/piidetector/logs/app.log"
-    echo ""
-    echo -e "${BLUE}🌐 Acesso: http://$(hostname -I | awk '{print $1}')${NC}"
+    echo -e "${BLUE}📝 Para configurar OpenAI API:${NC}"
+    echo "  nano /home/piidetector/config/.env"
+    echo "  # Adicionar: OPENAI_API_KEY=sk-sua-chave"
+    echo "  # Alterar: ENABLE_SEMANTIC_ANALYSIS=true"
+    echo "  pm2 restart pii-detector"
 }
 
 # Executar instalação

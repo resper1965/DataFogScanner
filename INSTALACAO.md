@@ -11,7 +11,7 @@
 ### Comando de Instalação
 ```bash
 # Fazer download e executar script
-wget https://raw.githubusercontent.com/resper1965/pii-detector/main/install.sh
+wget https://raw.githubusercontent.com/resper1965/DataFogScanner/main/install.sh
 chmod +x install.sh
 sudo ./install.sh
 ```
@@ -28,38 +28,20 @@ sudo ./install.sh
 
 ## Pós-instalação
 
-### 1. Upload do código da aplicação
-```bash
-# Fazer upload para: /home/piidetector/pii-detector/
-# Ou usar git clone:
-su - piidetector
-cd pii-detector
-git clone SEU_REPOSITORIO .
-```
+O script faz automaticamente:
+- Download do código do repositório
+- Instalação das dependências
+- Configuração do banco de dados
+- Inicialização da aplicação
 
-### 2. Instalar dependências
-```bash
-su - piidetector
-cd pii-detector
-npm install
-```
-
-### 3. Configurar banco de dados
-```bash
-npm run db:push
-```
-
-### 4. Configurar OpenAI (opcional)
+### Configurar OpenAI (opcional)
 ```bash
 nano /home/piidetector/config/.env
 # Adicionar: OPENAI_API_KEY=sk-sua-chave-aqui
 # Alterar: ENABLE_SEMANTIC_ANALYSIS=true
-```
 
-### 5. Iniciar aplicação
-```bash
-pm2 start ecosystem.config.js
-pm2 save
+# Reiniciar aplicação
+pm2 restart pii-detector
 ```
 
 ## Verificação
