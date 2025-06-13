@@ -141,7 +141,7 @@ systemctl reload nginx
 ### 3. Configurar SSL
 ```bash
 # Editar script SSL
-nano /home/datafog/setup-ssl.sh
+nano /home/piidetector/setup-ssl.sh
 
 # Alterar DOMAIN="SEU_DOMINIO.com"
 # Executar
@@ -151,10 +151,10 @@ sudo ./setup-ssl.sh
 ### 4. Configurar SFTP (Opcional)
 ```bash
 # Definir senha para usuário SFTP
-passwd datafog
+passwd piidetector
 
 # Testar conexão SFTP
-sftp datafog@localhost
+sftp piidetector@localhost
 ```
 
 ## 🔧 Verificação da Instalação
@@ -229,17 +229,17 @@ tail -f /var/log/pii-detector/monitor.log
 
 ### 1. Backup Manual
 ```bash
-# Como usuário datafog
+# Como usuário piidetector
 ./backup.sh
 
 # Verificar backups
-ls -la /home/datafog/backups/
+ls -la /home/piidetector/backups/
 ```
 
 ### 2. Atualização da Aplicação
 ```bash
 # Deploy de nova versão
-cd /home/datafog/pii-detector
+cd /home/piidetector/pii-detector
 git pull origin main
 ./deploy.sh
 ```
@@ -251,7 +251,7 @@ git pull origin main
 
 # Verificar espaço
 df -h
-du -sh /home/datafog/*
+du -sh /home/piidetector/*
 ```
 
 ## 🚨 Troubleshooting Rápido
@@ -279,7 +279,7 @@ find /var/log -name "*.log" -mtime +7 -delete
 **Database error:**
 ```bash
 sudo -u postgres psql -c "\l"
-sudo -u datafog psql pii_detector -c "SELECT version();"
+sudo -u piidetector psql pii_detector -c "SELECT version();"
 ```
 
 ## 📞 Suporte

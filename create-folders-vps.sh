@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para Criação de Estrutura de Pastas VPS - PII Detector DataFog
+# Script para Criação de Estrutura de Pastas VPS - PII Detector
 # Cria todas as pastas necessárias com permissões corretas
 
 set -e
@@ -27,8 +27,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variáveis de configuração
-APP_USER="datafog"
-BASE_DIR="/home/datafog"
+APP_USER="piidetector"
+BASE_DIR="/home/piidetector"
 APP_DIR="$BASE_DIR/pii-detector"
 UPLOADS_DIR="$BASE_DIR/uploads"
 SFTP_DIR="$UPLOADS_DIR/sftp"
