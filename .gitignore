@@ -1,15 +1,8 @@
 # Dependencies
-node_modules
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
-
-# Build outputs
-dist
-build
-.next
 
 # Environment variables
 .env
@@ -18,49 +11,13 @@ build
 .env.test.local
 .env.production.local
 
-# Database
-*.db
-*.sqlite
-
-# Uploads and temporary files
-uploads/*
-!uploads/.gitkeep
-logs/*
-!logs/.gitkeep
-temp/
-tmp/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Operating System
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Build outputs
+dist/
+build/
 
 # Logs
+logs/
 *.log
-logs
 
 # Runtime data
 pids
@@ -70,38 +27,68 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
-.nyc_output
 
-# Dependency directories
-jspm_packages/
+# Uploads and temporary files
+uploads/*
+!uploads/.gitkeep
+temp/
+tmp/
 
-# Optional npm cache directory
-.npm
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
-# Optional REPL history
-.node_repl_history
+# OS generated files
+.DS_Store
+Thumbs.db
 
-# Output of 'npm pack'
-*.tgz
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Yarn Integrity file
-.yarn-integrity
+# Replit files
+.replit
+replit.nix
 
-# dotenv environment variables file
-.env*
+# Test files
+test_*.txt
+test_*.py
+test_*.js
+*test*
+detected_data.json
+pdf_*.txt
 
-# Docker
-.dockerignore
-
-# SSL certificates
-ssl/
+# Development scripts
+*sync*
+*deploy*
+*github*
+*transfer*
+*force*
+*fix*
+*connect*
+setup-git.sh
+install-direto.sh
 
 # Backup files
 *.backup
 *.bak
 
-# Replit specific
-.replit
-replit.nix
-vite.config.ts.*
-server/public
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pyproject.toml
+uv.lock
+
+# Docker
+.docker/

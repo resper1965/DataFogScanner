@@ -1,36 +1,22 @@
-# PII Detector
+# PII Detector - DataFog Scanner
 
-Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros com interface moderna em português e processamento inteligente usando DataFog.
+Sistema brasileiro para detecção de dados pessoais (PII) em documentos com interface em português e processamento inteligente.
 
-## 🚀 Deploy Rápido para VPS
+## Instalação Rápida
 
-### Pré-requisitos
-- VPS com Ubuntu 20.04+ (mín. 4GB RAM, 2 CPU)
-- Docker e Docker Compose
-- Chave da OpenAI API
-
-### Instalação
+### VPS Ubuntu/Debian
 ```bash
-# 1. Clonar repositório
-git clone <seu-repositorio>
-cd pii-detector
-
-# 2. Executar deploy automatizado
-./deploy.sh
+wget https://raw.githubusercontent.com/resper1965/DataFogScanner/main/install.sh
+chmod +x install.sh
+sudo ./install.sh
 ```
 
-O script irá:
-- Instalar Docker automaticamente
-- Configurar PostgreSQL e Redis
-- Criar arquivos de configuração
-- Iniciar todos os serviços
-
-### Configuração Obrigatória
-Editar `.env`:
+### Desenvolvimento Local
 ```bash
-OPENAI_API_KEY=sk-sua-chave-aqui
-POSTGRES_PASSWORD=senha-segura
-SESSION_SECRET=chave-sessao-secreta
+git clone https://github.com/resper1965/DataFogScanner.git
+cd DataFogScanner
+npm install
+npm run dev
 ```
 
 ## 📋 Funcionalidades
