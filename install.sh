@@ -222,10 +222,32 @@ install_nodejs() {
 install_python() {
     log "Instalando Python e dependências..."
     
-    apt install -y python3.11 python3.11-venv python3.11-dev python3-pip
+    # Detectar versão do Python disponível
+    if apt list --installed python3.11 2>/dev/null | grep -q python3.11; then
+        PYTHON_VERSION="python3.11"
+    elif apt list --installed python3.10 2>/dev/null | grep -q python3.10; then
+        PYTHON_VERSION="python3.10"
+    else
+        PYTHON_VERSION="python3"
+    fi
+    
+    # Instalar Python disponível no sistema
+    apt install -y python3 python3-venv python3-dev python3-pip
+    
+    # Tentar instalar versão específica se disponível
+    if apt-cache search python3.11 | grep -q python3.11; then
+        apt install -y python3.11 python3.11-venv python3.11-dev
+    fi
     
     # Instalar DataFog e dependências Python
-    pip3 install --break-system-packages datafog openpyxl pypdf2 python-docx regex
+    if pip3 --version | grep -q "pip"; then
+        pip3 install --break-system-packages datafog openpyxl pypdf2 python-docx regex 2>/dev/null || \
+        pip3 install datafog openpyxl pypdf2 python-docx regex
+    else
+        warning "pip3 não encontrado, instalando manualmente"
+        apt install -y python3-pip
+        pip3 install datafog openpyxl pypdf2 python-docx regex
+    fi
     
     log "Python configurado"
 }
