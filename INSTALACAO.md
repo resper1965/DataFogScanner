@@ -34,6 +34,13 @@ O script faz automaticamente:
 - Configuração do banco de dados
 - Inicialização da aplicação
 
+### Configurar SSL/HTTPS (recomendado)
+```bash
+# Configurar domínio e certificado SSL gratuito
+su - piidetector
+./scripts/setup-ssl.sh seudominio.com admin@empresa.com
+```
+
 ### Configurar OpenAI (opcional)
 ```bash
 nano /home/piidetector/config/.env

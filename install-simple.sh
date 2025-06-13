@@ -22,7 +22,7 @@ apt update && apt upgrade -y
 echo "📦 Instalando dependências..."
 apt install -y curl wget git build-essential nginx redis-server \
     postgresql postgresql-contrib python3 python3-pip python3-venv \
-    ufw fail2ban htop nano
+    ufw fail2ban htop nano certbot python3-certbot-nginx
 
 # Criar usuário
 echo "👤 Criando usuário piidetector..."
@@ -218,6 +218,42 @@ EOF
 chmod +x /home/piidetector/check-system.sh
 chown piidetector:piidetector /home/piidetector/check-system.sh
 
+# Criar script SSL
+cat > /home/piidetector/setup-ssl.sh << 'EOF'
+#!/bin/bash
+
+DOMAIN="$1"
+EMAIL="$2"
+
+if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
+    echo "Uso: $0 <dominio> <email>"
+    echo "Exemplo: $0 pii.empresa.com admin@empresa.com"
+    exit 1
+fi
+
+echo "Configurando SSL para $DOMAIN..."
+
+# Atualizar Nginx com domínio
+sudo sed -i "s/server_name _;/server_name $DOMAIN;/" /etc/nginx/sites-available/pii-detector
+sudo nginx -t && sudo systemctl reload nginx
+
+# Obter certificado
+sudo certbot --nginx -d "$DOMAIN" --email "$EMAIL" --agree-tos --no-eff-email --non-interactive
+
+if [ $? -eq 0 ]; then
+    echo "✅ SSL configurado para $DOMAIN"
+    echo "🌐 Acesse: https://$DOMAIN"
+    
+    # Renovação automática
+    (sudo crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | sudo crontab -
+else
+    echo "❌ Erro SSL. Verifique se domínio aponta para este servidor"
+fi
+EOF
+
+chmod +x /home/piidetector/setup-ssl.sh
+chown piidetector:piidetector /home/piidetector/setup-ssl.sh
+
 echo ""
 echo "✅ INSTALAÇÃO CONCLUÍDA!"
 echo "========================"
@@ -230,7 +266,11 @@ echo "  su - piidetector && ./check-system.sh"
 echo "  pm2 logs pii-detector"
 echo "  pm2 restart pii-detector"
 echo ""
-echo "Para configurar OpenAI API:"
+echo "🔒 Para configurar SSL:"
+echo "  su - piidetector"
+echo "  ./setup-ssl.sh seudominio.com admin@empresa.com"
+echo ""
+echo "🤖 Para configurar OpenAI API:"
 echo "  nano /home/piidetector/config/.env"
 echo "  # Adicionar: OPENAI_API_KEY=sk-sua-chave"
 echo "  pm2 restart pii-detector"

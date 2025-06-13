@@ -313,6 +313,66 @@ configure_security() {
     log "Segurança configurada"
 }
 
+# Configurar SSL (opcional)
+setup_ssl() {
+    log "Configurando certificado SSL..."
+    
+    # Instalar Certbot
+    apt install -y certbot python3-certbot-nginx
+    
+    # Criar script de configuração SSL
+    cat > /home/piidetector/scripts/setup-ssl.sh << 'EOF'
+#!/bin/bash
+
+DOMAIN="$1"
+EMAIL="$2"
+
+if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
+    echo "Uso: $0 <dominio> <email>"
+    echo "Exemplo: $0 pii.empresa.com admin@empresa.com"
+    exit 1
+fi
+
+echo "Configurando SSL para $DOMAIN..."
+
+# Atualizar configuração do Nginx com o domínio
+sudo sed -i "s/server_name _;/server_name $DOMAIN;/" /etc/nginx/sites-available/pii-detector
+
+# Testar configuração
+sudo nginx -t
+
+if [ $? -eq 0 ]; then
+    # Recarregar Nginx
+    sudo systemctl reload nginx
+    
+    # Obter certificado SSL
+    sudo certbot --nginx -d "$DOMAIN" --email "$EMAIL" --agree-tos --no-eff-email --non-interactive
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ SSL configurado com sucesso para $DOMAIN"
+        echo "🌐 Acesse: https://$DOMAIN"
+        
+        # Configurar renovação automática
+        (crontab -l 2>/dev/null; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
+        echo "🔄 Renovação automática configurada"
+    else
+        echo "❌ Erro ao obter certificado SSL"
+        echo "Verifique se:"
+        echo "  • O domínio $DOMAIN aponta para este servidor"
+        echo "  • As portas 80 e 443 estão abertas"
+        echo "  • O Nginx está funcionando"
+    fi
+else
+    echo "❌ Erro na configuração do Nginx"
+fi
+EOF
+    
+    chmod +x /home/piidetector/scripts/setup-ssl.sh
+    chown piidetector:piidetector /home/piidetector/scripts/setup-ssl.sh
+    
+    log "Script SSL criado em /home/piidetector/scripts/setup-ssl.sh"
+}
+
 # Criar arquivo de configuração da aplicação
 create_app_config() {
     log "Criando configuração da aplicação..."
@@ -537,6 +597,7 @@ main() {
     install_python
     install_nginx
     configure_security
+    setup_ssl
     create_app_config
     setup_application
     create_utility_scripts
@@ -564,7 +625,13 @@ main() {
     echo "  • Logs: tail -f /home/piidetector/logs/app.log"
     echo "  • PM2: pm2 list, pm2 restart pii-detector"
     echo ""
-    echo -e "${BLUE}📝 Para configurar OpenAI API:${NC}"
+    echo -e "${BLUE}📝 Configurações opcionais:${NC}"
+    echo ""
+    echo -e "${YELLOW}🔒 Para configurar SSL (HTTPS):${NC}"
+    echo "  su - piidetector"
+    echo "  ./scripts/setup-ssl.sh seudominio.com admin@empresa.com"
+    echo ""
+    echo -e "${YELLOW}🤖 Para configurar OpenAI API:${NC}"
     echo "  nano /home/piidetector/config/.env"
     echo "  # Adicionar: OPENAI_API_KEY=sk-sua-chave"
     echo "  # Alterar: ENABLE_SEMANTIC_ANALYSIS=true"
