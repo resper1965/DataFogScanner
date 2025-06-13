@@ -61,19 +61,21 @@ pip3 install datafog pypdf2 python-docx openpyxl psycopg2-binary redis celery su
 print_success "Dependências Python instaladas"
 
 # Criar usuário
-APP_USER="datafog"
+APP_USER="piidetector"
 print_step "Criando usuário $APP_USER..."
 if ! id "$APP_USER" &>/dev/null; then
     useradd -m -s /bin/bash "$APP_USER"
-    usermod -aG www-data "$APP_USER"
-    print_success "Usuário $APP_USER criado"
+    usermod -aG www-data,sudo "$APP_USER"
+    # Definir senha inicial
+    echo "$APP_USER:PiiDetector2024!" | chpasswd
+    print_success "Usuário $APP_USER criado com senha padrão"
 else
     print_warning "Usuário já existe"
 fi
 
 # Criar estrutura completa de pastas
 print_step "Criando estrutura de diretórios..."
-BASE_DIR="/home/datafog"
+BASE_DIR="/home/piidetector"
 APP_DIR="$BASE_DIR/pii-detector"
 UPLOADS_DIR="$BASE_DIR/uploads"
 SFTP_DIR="$UPLOADS_DIR/sftp"
@@ -207,7 +209,7 @@ JWT_SECRET=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-32)
 
 # Criar arquivo de configuração
 cat > "$CONFIG_DIR/.env" << EOF
-# Configuração PII Detector DataFog - Gerado em $(date)
+# Configuração PII Detector - Gerado em $(date)
 NODE_ENV=production
 PORT=5000
 
@@ -297,8 +299,8 @@ cat > "$BASE_DIR/deploy.sh" << 'EOF'
 #!/bin/bash
 set -e
 
-APP_DIR="/home/datafog/pii-detector"
-BACKUP_DIR="/home/datafog/backups"
+APP_DIR="/home/piidetector/pii-detector"
+BACKUP_DIR="/home/piidetector/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 echo "🚀 Iniciando deploy..."

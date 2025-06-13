@@ -54,7 +54,7 @@ chmod +x *.sh
 ```bash
 # Definir senha do PostgreSQL
 sudo -u postgres psql
-ALTER USER datafog PASSWORD 'SUA_SENHA_MUITO_SEGURA';
+ALTER USER piidetector PASSWORD 'SUA_SENHA_MUITO_SEGURA';
 \q
 
 # Gerar secrets seguros
@@ -65,12 +65,12 @@ openssl rand -base64 32  # Para JWT_SECRET
 #### Passo 5: Configurar Variáveis
 ```bash
 # Editar configuração
-nano /home/datafog/config/.env
+nano /home/piidetector/config/.env
 ```
 
 Configurar:
 ```env
-DATABASE_URL=postgresql://datafog:SUA_SENHA@localhost/pii_detector
+DATABASE_URL=postgresql://piidetector:SUA_SENHA@localhost/pii_detector
 PGPASSWORD=SUA_SENHA
 SESSION_SECRET=SEU_SECRET_GERADO
 JWT_SECRET=SEU_JWT_SECRET_GERADO
@@ -79,11 +79,11 @@ OPENAI_API_KEY=sk-seu-key-aqui  # Opcional
 
 #### Passo 6: Deploy da Aplicação
 ```bash
-# Mudar para usuário datafog
-su - datafog
+# Mudar para usuário piidetector
+su - piidetector
 
 # Ir para diretório
-cd /home/datafog/pii-detector
+cd /home/piidetector/pii-detector
 
 # Clonar repositório
 git clone https://github.com/seu-usuario/pii-detector.git .
@@ -106,9 +106,9 @@ chmod +x docker-install.sh
 
 #### Passo 2: Deploy Docker
 ```bash
-# Mudar para usuário datafog
-su - datafog
-cd /home/datafog/pii-detector
+# Mudar para usuário piidetector
+su - piidetector
+cd /home/piidetector/pii-detector
 
 # Clonar repositório
 git clone https://github.com/seu-usuario/pii-detector.git .
@@ -121,7 +121,7 @@ git clone https://github.com/seu-usuario/pii-detector.git .
 
 ### 1. Verificar Sistema
 ```bash
-# Como usuário datafog
+# Como usuário piidetector
 ./check-folders.sh
 ./check-system.sh
 ```
