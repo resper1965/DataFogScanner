@@ -239,14 +239,23 @@ install_python() {
         apt install -y python3.11 python3.11-venv python3.11-dev
     fi
     
-    # Instalar DataFog e dependências Python
-    if pip3 --version | grep -q "pip"; then
-        pip3 install --break-system-packages datafog openpyxl pypdf2 python-docx regex 2>/dev/null || \
-        pip3 install datafog openpyxl pypdf2 python-docx regex
+    # Instalar DataFog e dependências Python usando pipx ou venv
+    if command -v pipx >/dev/null 2>&1; then
+        # Usar pipx se disponível
+        pipx install datafog
+        pipx inject datafog openpyxl pypdf2 python-docx regex
     else
-        warning "pip3 não encontrado, instalando manualmente"
-        apt install -y python3-pip
-        pip3 install datafog openpyxl pypdf2 python-docx regex
+        # Instalar pipx primeiro
+        apt install -y pipx python3-full
+        
+        # Criar ambiente virtual para o projeto
+        sudo -u piidetector python3 -m venv /home/piidetector/venv
+        
+        # Instalar pacotes no ambiente virtual
+        sudo -u piidetector /home/piidetector/venv/bin/pip install datafog openpyxl pypdf2 python-docx regex
+        
+        # Criar link simbólico para facilitar uso
+        ln -sf /home/piidetector/venv/bin/python3 /usr/local/bin/datafog-python
     fi
     
     log "Python configurado"

@@ -68,8 +68,13 @@ npm install -g pm2
 
 # Instalar Python packages
 echo "🐍 Instalando packages Python..."
-pip3 install --break-system-packages datafog openpyxl pypdf2 python-docx regex || \
-pip3 install datafog openpyxl pypdf2 python-docx regex
+apt install -y pipx python3-full
+
+# Criar ambiente virtual
+sudo -u piidetector python3 -m venv /home/piidetector/venv
+
+# Instalar no ambiente virtual
+sudo -u piidetector /home/piidetector/venv/bin/pip install datafog openpyxl pypdf2 python-docx regex
 
 # Configurar Nginx
 echo "🌐 Configurando Nginx..."
