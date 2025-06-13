@@ -108,6 +108,7 @@ This is a comprehensive Brazilian PII (Personally Identifiable Information) dete
 
 - June 13, 2025. Initial setup
 - June 13, 2025. Created comprehensive advanced installation guide with complete directory structure, user consistency fixes, and enterprise-grade configuration options
+- June 13, 2025. Cleaned up multiple installation guides and consolidated into single functional script (install.sh) and simplified documentation (INSTALACAO.md)
 
 # User Preferences
 
