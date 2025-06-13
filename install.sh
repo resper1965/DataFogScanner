@@ -144,8 +144,8 @@ install_postgresql() {
     log "Instalando PostgreSQL..."
     
     # Instalar PostgreSQL 15
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     apt update
     apt install -y postgresql-15 postgresql-contrib-15
     
@@ -179,11 +179,22 @@ install_redis() {
     # Configurar Redis
     REDIS_PASS=$(openssl rand -base64 16)
     
-    cat > /etc/redis/redis.conf.d/pii-detector.conf << EOF
+    # Método alternativo de configuração para compatibilidade
+    if [ -d "/etc/redis" ]; then
+        # Criar diretório de configuração se não existir
+        mkdir -p /etc/redis/redis.conf.d
+        
+        cat > /etc/redis/redis.conf.d/pii-detector.conf << EOF
 requirepass $REDIS_PASS
 maxmemory 512mb
 maxmemory-policy allkeys-lru
 EOF
+    else
+        # Configuração alternativa diretamente no arquivo principal
+        echo "requirepass $REDIS_PASS" >> /etc/redis.conf
+        echo "maxmemory 512mb" >> /etc/redis.conf
+        echo "maxmemory-policy allkeys-lru" >> /etc/redis.conf
+    fi
     
     systemctl restart redis-server
     systemctl enable redis-server
