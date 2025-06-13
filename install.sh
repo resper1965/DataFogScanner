@@ -231,32 +231,20 @@ install_python() {
         PYTHON_VERSION="python3"
     fi
     
-    # Instalar Python disponível no sistema
-    apt install -y python3 python3-venv python3-dev python3-pip
+    # Instalar Python e ferramentas necessárias
+    apt install -y python3 python3-venv python3-dev python3-pip python3-full pipx
     
-    # Tentar instalar versão específica se disponível
-    if apt-cache search python3.11 | grep -q python3.11; then
-        apt install -y python3.11 python3.11-venv python3.11-dev
-    fi
+    log "Criando ambiente virtual Python..."
+    # Criar ambiente virtual para o projeto (evita conflitos com sistema)
+    sudo -u piidetector python3 -m venv /home/piidetector/venv
     
-    # Instalar DataFog e dependências Python usando pipx ou venv
-    if command -v pipx >/dev/null 2>&1; then
-        # Usar pipx se disponível
-        pipx install datafog
-        pipx inject datafog openpyxl pypdf2 python-docx regex
-    else
-        # Instalar pipx primeiro
-        apt install -y pipx python3-full
-        
-        # Criar ambiente virtual para o projeto
-        sudo -u piidetector python3 -m venv /home/piidetector/venv
-        
-        # Instalar pacotes no ambiente virtual
-        sudo -u piidetector /home/piidetector/venv/bin/pip install datafog openpyxl pypdf2 python-docx regex
-        
-        # Criar link simbólico para facilitar uso
-        ln -sf /home/piidetector/venv/bin/python3 /usr/local/bin/datafog-python
-    fi
+    log "Instalando DataFog e dependências no ambiente virtual..."
+    # Instalar pacotes no ambiente virtual isolado
+    sudo -u piidetector /home/piidetector/venv/bin/pip install --upgrade pip
+    sudo -u piidetector /home/piidetector/venv/bin/pip install datafog openpyxl pypdf2 python-docx regex
+    
+    # Criar link simbólico para facilitar uso
+    ln -sf /home/piidetector/venv/bin/python3 /usr/local/bin/datafog-python
     
     log "Python configurado"
 }
@@ -438,6 +426,9 @@ SFTP_WATCH_DIR=/home/piidetector/uploads/sftp
 # Logging
 LOG_LEVEL=info
 LOG_DIR=/home/piidetector/logs
+
+# Python Environment
+PYTHON_PATH=/home/piidetector/venv/bin/python3
 EOF
     
     chown piidetector:piidetector /home/piidetector/config/.env

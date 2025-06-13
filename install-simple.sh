@@ -155,6 +155,9 @@ SFTP_WATCH_DIR=/home/piidetector/uploads/sftp
 # Logging
 LOG_LEVEL=info
 LOG_DIR=/home/piidetector/logs
+
+# Python Environment
+PYTHON_PATH=/home/piidetector/venv/bin/python3
 EOF
 
 chown piidetector:piidetector /home/piidetector/config/.env
