@@ -329,7 +329,7 @@ EMAIL="$2"
 
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
     echo "Uso: $0 <dominio> <email>"
-    echo "Exemplo: $0 pii.empresa.com admin@empresa.com"
+    echo "Exemplo: $0 monster.e-ness.com.br admin@e-ness.com.br"
     exit 1
 fi
 
@@ -629,7 +629,7 @@ main() {
     echo ""
     echo -e "${YELLOW}🔒 Para configurar SSL (HTTPS):${NC}"
     echo "  su - piidetector"
-    echo "  ./scripts/setup-ssl.sh seudominio.com admin@empresa.com"
+    echo "  ./scripts/setup-ssl.sh monster.e-ness.com.br admin@e-ness.com.br"
     echo ""
     echo -e "${YELLOW}🤖 Para configurar OpenAI API:${NC}"
     echo "  nano /home/piidetector/config/.env"

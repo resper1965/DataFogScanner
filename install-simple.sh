@@ -227,7 +227,7 @@ EMAIL="$2"
 
 if [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
     echo "Uso: $0 <dominio> <email>"
-    echo "Exemplo: $0 pii.empresa.com admin@empresa.com"
+    echo "Exemplo: $0 monster.e-ness.com.br admin@e-ness.com.br"
     exit 1
 fi
 
@@ -268,7 +268,7 @@ echo "  pm2 restart pii-detector"
 echo ""
 echo "🔒 Para configurar SSL:"
 echo "  su - piidetector"
-echo "  ./setup-ssl.sh seudominio.com admin@empresa.com"
+echo "  ./setup-ssl.sh monster.e-ness.com.br admin@e-ness.com.br"
 echo ""
 echo "🤖 Para configurar OpenAI API:"
 echo "  nano /home/piidetector/config/.env"

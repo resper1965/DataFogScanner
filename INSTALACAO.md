@@ -36,9 +36,9 @@ O script faz automaticamente:
 
 ### Configurar SSL/HTTPS (recomendado)
 ```bash
-# Configurar domínio e certificado SSL gratuito
+# Configurar domínio monster.e-ness.com.br
 su - piidetector
-./scripts/setup-ssl.sh seudominio.com admin@empresa.com
+./scripts/setup-ssl.sh monster.e-ness.com.br admin@e-ness.com.br
 ```
 
 ### Configurar OpenAI (opcional)

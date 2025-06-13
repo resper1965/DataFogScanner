@@ -18,6 +18,12 @@ sudo ./install.sh
 ## Acesso
 Após a instalação, acesse: `http://SEU_IP_SERVIDOR`
 
+## Configuração SSL (recomendado)
+```bash
+su - piidetector
+./setup-ssl.sh monster.e-ness.com.br admin@e-ness.com.br
+```
+
 ## Configuração OpenAI (opcional)
 ```bash
 nano /home/piidetector/config/.env
