@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Instalação Completa VPS - PII Detector DataFog
+# Instalação Completa VPS - PII Detector
 # Script único que executa toda a instalação automaticamente
 
 set -e
@@ -17,7 +17,7 @@ print_success() { echo -e "${GREEN}✓${NC} $1"; }
 print_warning() { echo -e "${YELLOW}!${NC} $1"; }
 print_error() { echo -e "${RED}✗${NC} $1"; }
 
-echo "🚀 Instalação Completa - PII Detector DataFog"
+echo "🚀 Instalação Completa - PII Detector"
 echo "============================================="
 
 # Verificar root

@@ -1,6 +1,6 @@
-# DataFog PII Detector
+# PII Detector
 
-Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros utilizando DataFog oficial, com interface moderna em português e processamento inteligente.
+Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros com interface moderna em português e processamento inteligente usando DataFog.
 
 ## 🚀 Deploy Rápido para VPS
 
@@ -13,7 +13,7 @@ Sistema avançado para detecção de informações pessoais identificáveis (PII
 ```bash
 # 1. Clonar repositório
 git clone <seu-repositorio>
-cd datafog-pii-detector
+cd pii-detector
 
 # 2. Executar deploy automatizado
 ./deploy.sh

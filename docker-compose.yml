@@ -84,7 +84,7 @@ services:
   # Nginx reverse proxy (optional, for production)
   nginx:
     image: nginx:alpine
-    container_name: datafog-nginx
+    container_name: pii-detector-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -111,4 +111,4 @@ volumes:
 
 networks:
   default:
-    name: datafog-network
+    name: pii-detector-network
