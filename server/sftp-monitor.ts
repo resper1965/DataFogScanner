@@ -5,9 +5,9 @@ import { storage } from "./storage";
 import { processFiles } from "./datafog-processor";
 import { securityScanner } from "./security-scanner";
 
-const SFTP_INCOMING_DIR = "/home/datafog/uploads/sftp/incoming";
-const SFTP_PROCESSING_DIR = "/home/datafog/uploads/sftp/processing";
-const SFTP_PROCESSED_DIR = "/home/datafog/uploads/sftp/processed";
+const SFTP_INCOMING_DIR = "./uploads/sftp/incoming";
+const SFTP_PROCESSING_DIR = "./uploads/sftp/processing";
+const SFTP_PROCESSED_DIR = "./uploads/sftp/processed";
 
 class SFTPMonitor {
   private isMonitoring = false;
@@ -18,11 +18,27 @@ class SFTPMonitor {
     console.log("Iniciando monitoramento SFTP...");
     this.isMonitoring = true;
 
+    // Ensure directories exist
+    await this.ensureDirectoriesExist();
+
     // Monitor directory for new files
     this.watchDirectory();
     
     // Process existing files on startup
     await this.processExistingFiles();
+  }
+
+  private async ensureDirectoriesExist() {
+    const { mkdir } = await import("fs/promises");
+    
+    try {
+      await mkdir(SFTP_INCOMING_DIR, { recursive: true });
+      await mkdir(SFTP_PROCESSING_DIR, { recursive: true });
+      await mkdir(SFTP_PROCESSED_DIR, { recursive: true });
+      console.log("Diretórios SFTP criados/verificados");
+    } catch (error) {
+      console.error("Erro ao criar diretórios SFTP:", error);
+    }
   }
 
   private watchDirectory() {
