@@ -4,7 +4,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: datafog-postgres
+    container_name: pii-detector-postgres
     environment:
       POSTGRES_DB: datafog
       POSTGRES_USER: datafog_user
@@ -24,7 +24,7 @@ services:
   # Redis for session storage and caching
   redis:
     image: redis:7-alpine
-    container_name: datafog-redis
+    container_name: pii-detector-redis
     ports:
       - "6379:6379"
     volumes:
@@ -40,7 +40,7 @@ services:
   # Main Application
   app:
     build: .
-    container_name: datafog-app
+    container_name: pii-detector-app
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://datafog_user:${POSTGRES_PASSWORD:-datafog_secure_password}@postgres:5432/datafog
