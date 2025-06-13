@@ -90,6 +90,234 @@ sudo timedatectl set-timezone America/Sao_Paulo
 # Criar usuário da aplicação
 sudo useradd -m -s /bin/bash -G sudo,www-data piidetector
 sudo passwd piidetector
+
+# Criar estrutura de diretórios completa
+sudo -u piidetector bash << 'EOF'
+cd /home/piidetector
+
+# Criar estrutura principal
+mkdir -p {config,logs,uploads,backups,scripts,sftp,temp}
+
+# Criar subdiretórios de uploads
+mkdir -p uploads/{pending,processing,completed,quarantine,sftp}
+
+# Criar diretórios de logs específicos
+mkdir -p logs/{app,security,performance,backup}
+
+# Criar diretórios de backup
+mkdir -p backups/{daily,weekly,monthly}
+
+# Criar diretórios de configuração
+mkdir -p config/{nginx,ssl,monitoring}
+
+# Criar diretórios para aplicação
+mkdir -p pii-detector
+
+# Criar diretórios para scripts utilitários
+mkdir -p scripts/{maintenance,monitoring,backup,deploy}
+
+# Configurar permissões
+chmod 755 uploads uploads/*
+chmod 750 config
+chmod 755 logs logs/*
+chmod 700 backups backups/*
+chmod 755 scripts scripts/*
+
+# Criar arquivo de configuração da estrutura
+cat > config/directories.conf << 'EOD'
+# Configuração da estrutura de diretórios
+BASE_DIR=/home/piidetector
+APP_DIR=$BASE_DIR/pii-detector
+UPLOAD_DIR=$BASE_DIR/uploads
+LOG_DIR=$BASE_DIR/logs
+BACKUP_DIR=$BASE_DIR/backups
+CONFIG_DIR=$BASE_DIR/config
+SCRIPTS_DIR=$BASE_DIR/scripts
+SFTP_DIR=$BASE_DIR/uploads/sftp
+TEMP_DIR=$BASE_DIR/temp
+
+# Limites de armazenamento (em MB)
+MAX_UPLOAD_SIZE=10240
+MAX_LOG_SIZE=1024
+MAX_BACKUP_SIZE=51200
+
+# Retenção (em dias)
+UPLOAD_RETENTION=90
+LOG_RETENTION=30
+BACKUP_RETENTION=90
+EOD
+
+EOF
+
+# Criar logs do sistema
+sudo mkdir -p /var/log/pii-detector
+sudo chown piidetector:piidetector /var/log/pii-detector
+sudo chmod 755 /var/log/pii-detector
+```
+
+### Script de Verificação da Estrutura
+
+```bash
+# Criar script de verificação
+sudo -u piidetector cat > /home/piidetector/check-folders.sh << 'EOF'
+#!/bin/bash
+
+# Cores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Carregar configuração
+if [ -f "/home/piidetector/config/directories.conf" ]; then
+    source /home/piidetector/config/directories.conf
+else
+    echo -e "${RED}❌ Arquivo de configuração não encontrado${NC}"
+    exit 1
+fi
+
+echo -e "${BLUE}=============================================="
+echo "📁 VERIFICAÇÃO DA ESTRUTURA DE PASTAS"
+echo -e "==============================================${NC}"
+echo ""
+
+# Função para verificar diretório
+check_directory() {
+    local dir=$1
+    local description=$2
+    
+    if [ -d "$dir" ]; then
+        local size=$(du -sh "$dir" 2>/dev/null | cut -f1)
+        local perms=$(ls -ld "$dir" | cut -d' ' -f1)
+        echo -e "✅ ${GREEN}$description${NC}"
+        echo -e "   📂 $dir"
+        echo -e "   📏 Tamanho: $size"
+        echo -e "   🔒 Permissões: $perms"
+        echo ""
+    else
+        echo -e "❌ ${RED}$description${NC}"
+        echo -e "   📂 $dir ${RED}(NÃO ENCONTRADO)${NC}"
+        echo ""
+    fi
+}
+
+# Verificar diretórios principais
+echo -e "${YELLOW}📋 Diretórios Principais:${NC}"
+check_directory "$BASE_DIR" "Base da aplicação"
+check_directory "$APP_DIR" "Código da aplicação"
+check_directory "$CONFIG_DIR" "Configurações"
+check_directory "$SCRIPTS_DIR" "Scripts utilitários"
+
+echo -e "${YELLOW}📤 Diretórios de Upload:${NC}"
+check_directory "$UPLOAD_DIR" "Uploads principais"
+check_directory "$UPLOAD_DIR/pending" "Arquivos pendentes"
+check_directory "$UPLOAD_DIR/processing" "Processamento"
+check_directory "$UPLOAD_DIR/completed" "Processados"
+check_directory "$UPLOAD_DIR/quarantine" "Quarentena"
+check_directory "$SFTP_DIR" "SFTP"
+
+echo -e "${YELLOW}📊 Logs e Monitoramento:${NC}"
+check_directory "$LOG_DIR" "Logs da aplicação"
+check_directory "/var/log/pii-detector" "Logs do sistema"
+
+echo -e "${YELLOW}💾 Backup:${NC}"
+check_directory "$BACKUP_DIR" "Backups"
+check_directory "$BACKUP_DIR/daily" "Backups diários"
+
+# Verificar espaço em disco
+echo -e "${YELLOW}💽 Uso de Espaço:${NC}"
+df -h "$BASE_DIR" | tail -1 | while read filesystem size used avail percent mount; do
+    echo -e "📁 Filesystem: $filesystem"
+    echo -e "📏 Tamanho total: $size"
+    echo -e "📊 Usado: $used ($percent)"
+    echo -e "📈 Disponível: $avail"
+done
+echo ""
+
+# Resumo de arquivos
+echo -e "${YELLOW}📈 Estatísticas:${NC}"
+total_dirs=$(find "$BASE_DIR" -type d | wc -l)
+total_files=$(find "$BASE_DIR" -type f | wc -l)
+echo -e "📂 Total de diretórios: $total_dirs"
+echo -e "📄 Total de arquivos: $total_files"
+echo ""
+
+echo -e "${BLUE}✅ Verificação concluída!${NC}"
+EOF
+
+# Criar script de limpeza
+sudo -u piidetector cat > /home/piidetector/cleanup-folders.sh << 'EOF'
+#!/bin/bash
+
+# Carregar configuração
+source /home/piidetector/config/directories.conf
+
+echo "🧹 Iniciando limpeza automática..."
+
+# Limpeza de uploads antigos
+echo "📤 Limpando uploads antigos..."
+find "$UPLOAD_DIR/completed" -name "*" -mtime +$UPLOAD_RETENTION -delete 2>/dev/null
+find "$UPLOAD_DIR/quarantine" -name "*" -mtime +7 -delete 2>/dev/null
+
+# Limpeza de logs antigos
+echo "📊 Limpando logs antigos..."
+find "$LOG_DIR" -name "*.log.*" -mtime +$LOG_RETENTION -delete 2>/dev/null
+find "/var/log/pii-detector" -name "*.log.*" -mtime +$LOG_RETENTION -delete 2>/dev/null
+
+# Limpeza de backups antigos
+echo "💾 Limpando backups antigos..."
+find "$BACKUP_DIR" -name "*.tar.gz" -mtime +$BACKUP_RETENTION -delete 2>/dev/null
+
+# Limpeza de arquivos temporários
+echo "🗑️ Limpando arquivos temporários..."
+find "$TEMP_DIR" -name "*" -mtime +1 -delete 2>/dev/null
+
+# Limpeza de cache do sistema
+echo "💾 Limpando cache do sistema..."
+sudo apt autoremove -y > /dev/null 2>&1
+sudo apt autoclean > /dev/null 2>&1
+
+echo "✅ Limpeza concluída!"
+
+# Mostrar espaço liberado
+df -h "$BASE_DIR" | tail -1 | awk '{print "💽 Espaço disponível: "$4" ("$5" usado)"}'
+EOF
+
+# Tornar scripts executáveis
+sudo chmod +x /home/piidetector/check-folders.sh
+sudo chmod +x /home/piidetector/cleanup-folders.sh
+
+# Agendar limpeza automática
+sudo -u piidetector bash << 'EOF'
+(crontab -l 2>/dev/null; echo "0 3 * * * /home/piidetector/cleanup-folders.sh") | crontab -
+EOF
+
+echo ""
+echo -e "${GREEN}=============================================="
+echo "📁 ESTRUTURA DE PASTAS CRIADA!"
+echo -e "==============================================${NC}"
+echo ""
+echo -e "${BLUE}📊 Resumo da estrutura:${NC}"
+echo "  • Usuário: piidetector"
+echo "  • Base: /home/piidetector"
+echo "  • Aplicação: /home/piidetector/pii-detector"
+echo "  • Uploads: /home/piidetector/uploads"
+echo "  • SFTP: /home/piidetector/uploads/sftp"
+echo "  • Logs: /var/log/pii-detector e /home/piidetector/logs"
+echo "  • Backups: /home/piidetector/backups"
+echo ""
+echo -e "${YELLOW}🔧 Scripts criados:${NC}"
+echo "  • /home/piidetector/check-folders.sh - Verificar estrutura"
+echo "  • /home/piidetector/cleanup-folders.sh - Limpeza automática"
+echo ""
+echo -e "${GREEN}📋 Para verificar a estrutura:${NC}"
+echo "  su - piidetector"
+echo "  ./check-folders.sh"
+echo ""
+echo -e "${BLUE}🧹 Limpeza automática agendada para 03:00 diariamente${NC}"
+echo ""
+echo -e "${GREEN}✅ Pronto para próxima etapa da instalação!${NC}"
 ```
 
 ### Etapa 2: Instalação PostgreSQL Avançada
