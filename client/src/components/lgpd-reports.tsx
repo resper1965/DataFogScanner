@@ -48,10 +48,10 @@ interface LGPDFilters {
   dateTo?: Date;
   ownerName?: string;
   documentType?: string;
-  lgpdCategory?: 'personal_data' | 'sensitive_data' | 'children_data';
-  retentionStatus?: 'active' | 'expired' | 'pending_deletion';
-  consentStatus?: 'granted' | 'revoked' | 'pending';
-  riskLevel?: 'high' | 'medium' | 'low';
+  lgpdCategory?: 'all' | 'personal_data' | 'sensitive_data' | 'children_data';
+  retentionStatus?: 'all' | 'active' | 'expired' | 'pending_deletion';
+  consentStatus?: 'all' | 'granted' | 'revoked' | 'pending';
+  riskLevel?: 'all' | 'high' | 'medium' | 'low';
 }
 
 interface DataSubjectReport {
