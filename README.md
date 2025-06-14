@@ -1,85 +1,90 @@
-# PII Detector - Sistema de Detecção de Dados Sensíveis
+# PII Detector - Sistema de Detecção de Dados Pessoais Brasileiro
 
-Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros com React, Node.js e análise de IA.
+Sistema completo de detecção de PII (Personally Identifiable Information) brasileiro com interface moderna e recursos avançados de conformidade LGPD.
 
 ## Características
 
-- 🔍 Detecção inteligente de CPF, CNPJ, RG, emails, telefones
-- 🛡️ Scanner de segurança com verificação de malware  
-- 📊 Relatórios e dashboards interativos
-- 🤖 Validação semântica com OpenAI
-- 📁 Suporte a PDF, DOC, XLS, TXT, CSV, XML
-- 🚀 Processamento otimizado para produção
+- **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
+- **Interface Moderna**: Design responsivo com Montserrat e componentes Radix UI
+- **LGPD Compliance**: Relatórios detalhados e gestão de conformidade
+- **Processamento Híbrido**: Regex + validação semântica via OpenAI
+- **Arquitetura Escalável**: React + Node.js + PostgreSQL + Redis
 
-## Tecnologias
+## Instalação VPS
 
-**Frontend**: React 18 + TypeScript + Tailwind CSS + Radix UI  
-**Backend**: Node.js + Express + TypeScript + Drizzle ORM  
-**Database**: PostgreSQL + Redis  
-**AI**: DataFog + OpenAI API  
-**Deploy**: PM2 + Nginx + Docker
-
-## Instalação
+Execute um único comando para instalação completa:
 
 ```bash
-git clone https://github.com/resper1965/DataFogScanner.git
-cd DataFogScanner
+# Clone o repositório
+git clone <repository-url> pii-detector
+cd pii-detector
+
+# Execute a instalação (como root)
 sudo ./install.sh
 ```
 
-O instalador configura automaticamente PostgreSQL, Redis, Node.js, Python, Nginx e firewall.
-
-## Configuração
-
-### Variáveis principais
-
-```bash
-DATABASE_URL=postgresql://user:pass@localhost:5432/pii_detector
-OPENAI_API_KEY=sk-sua-chave  # opcional
-MAX_FILE_SIZE=104857600
-ENABLE_SEMANTIC_ANALYSIS=true
-```
-
-### Comandos úteis
-
-```bash
-# Status da aplicação
-pm2 list
-pm2 logs pii-detector
-
-# Verificar serviços  
-systemctl status postgresql redis-server nginx
-
-# Backup
-pg_dump pii_detector > backup.sql
-```
-
-## Tipos de Dados Detectados
-
-- CPF (Cadastro de Pessoa Física)
-- CNPJ (Cadastro Nacional da Pessoa Jurídica)
-- RG (Registro Geral)
-- Email, Telefone, CEP
-- PIS/PASEP, NIRE
-
-## Desenvolvimento
-
-```bash
-npm install
-npm run db:push
-npm run dev
-```
+O script automaticamente:
+- Instala todas as dependências (Node.js, PostgreSQL, Redis, Nginx)
+- Configura usuário `piidetector`
+- Configura banco de dados e sessões Redis
+- Faz build da aplicação
+- Configura PM2 e Nginx
+- Inicia todos os serviços
 
 ## Acesso
 
-Após instalação: `http://seu-servidor/`
+- **URL**: http://monster.e-ness.com.br
+- **Usuário**: piidetector
+- **Diretório**: /home/piidetector/pii-detector
 
-Para SSL: `certbot --nginx -d seu-dominio.com`
+## Comandos Úteis
 
-## Licença
+```bash
+# Status da aplicação
+sudo -u piidetector pm2 list
 
-MIT License
+# Logs da aplicação
+sudo -u piidetector pm2 logs pii-detector
 
----
+# Reiniciar aplicação
+sudo -u piidetector pm2 restart pii-detector
 
-Desenvolvido por E-NESS
+# Status dos serviços
+systemctl status postgresql redis-server nginx
+```
+
+## Estrutura do Projeto
+
+```
+├── client/          # Frontend React + TypeScript
+├── server/          # Backend Node.js + Express
+├── shared/          # Schemas e tipos compartilhados
+├── uploads/         # Arquivos carregados
+├── install.sh       # Script de instalação completa
+└── ecosystem.config.cjs # Configuração PM2
+```
+
+## Tecnologias
+
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Radix UI
+- **Backend**: Node.js, Express, TypeScript
+- **Banco**: PostgreSQL com Drizzle ORM
+- **Cache**: Redis para sessões
+- **Deploy**: PM2 + Nginx
+- **Processamento**: Python DataFog + OpenAI
+
+## Recursos LGPD
+
+- Detecção de dados pessoais, sensíveis e de menores
+- Relatórios de conformidade detalhados
+- Gestão de consentimentos e bases legais
+- Alertas de retenção e violações
+- Notificações funcionais com ações
+
+## Segurança
+
+- Autenticação baseada em sessões
+- Validação de entrada com Zod
+- Verificação de malware
+- Headers de segurança
+- Firewall UFW configurado

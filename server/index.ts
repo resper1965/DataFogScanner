@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import RedisStore from "connect-redis";
+import { RedisStore } from "connect-redis";
 import { createClient } from "redis";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -27,7 +27,7 @@ redisClient.on('connect', () => {
 redisClient.connect().catch(console.error);
 
 // Session configuration with Redis store for production
-const sessionConfig = {
+const sessionConfig: any = {
   secret: process.env.SESSION_SECRET || 'pii-detector-secret-key-2024',
   resave: false,
   saveUninitialized: false,
