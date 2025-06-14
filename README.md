@@ -1,68 +1,85 @@
-# PII Detector - DataFog Scanner
+# PII Detector - Sistema de Detecção de Dados Sensíveis
 
-Sistema brasileiro para detecção de dados pessoais (PII) em documentos com interface em português e processamento inteligente.
+Sistema avançado para detecção de informações pessoais identificáveis (PII) em documentos brasileiros com React, Node.js e análise de IA.
 
-## Instalação Rápida
+## Características
 
-### VPS Ubuntu/Debian
-```bash
-wget https://raw.githubusercontent.com/resper1965/DataFogScanner/main/install.sh
-chmod +x install.sh
-sudo ./install.sh
-```
-
-### Desenvolvimento Local
-```bash
-git clone https://github.com/resper1965/DataFogScanner.git
-cd DataFogScanner
-npm install
-npm run dev
-```
-
-## Funcionalidades
-
-- Detecção de CPF, CNPJ, RG, CEP, telefones e emails
-- Processamento híbrido: Regex + IA semântica
-- Suporte a PDF, DOCX, XLSX, TXT, ZIP
-- Interface em português brasileiro
-- Dashboard em tempo real
-- Sistema de casos e auditoria
+- 🔍 Detecção inteligente de CPF, CNPJ, RG, emails, telefones
+- 🛡️ Scanner de segurança com verificação de malware  
+- 📊 Relatórios e dashboards interativos
+- 🤖 Validação semântica com OpenAI
+- 📁 Suporte a PDF, DOC, XLS, TXT, CSV, XML
+- 🚀 Processamento otimizado para produção
 
 ## Tecnologias
 
-- Frontend: React + TypeScript + Tailwind CSS
-- Backend: Node.js + Express + TypeScript
-- Banco: PostgreSQL + Drizzle ORM
-- Cache: Redis
-- IA: OpenAI (opcional)
-- Detecção: DataFog + Regex
+**Frontend**: React 18 + TypeScript + Tailwind CSS + Radix UI  
+**Backend**: Node.js + Express + TypeScript + Drizzle ORM  
+**Database**: PostgreSQL + Redis  
+**AI**: DataFog + OpenAI API  
+**Deploy**: PM2 + Nginx + Docker
 
-## Configuração OpenAI (Opcional)
+## Instalação
 
-Para melhor precisão na detecção:
 ```bash
-nano /home/piidetector/config/.env
-# Adicionar: OPENAI_API_KEY=sk-sua-chave
-# Alterar: ENABLE_SEMANTIC_ANALYSIS=true
-pm2 restart pii-detector
+git clone https://github.com/resper1965/DataFogScanner.git
+cd DataFogScanner
+sudo ./install.sh
 ```
 
-## Comandos Úteis
+O instalador configura automaticamente PostgreSQL, Redis, Node.js, Python, Nginx e firewall.
+
+## Configuração
+
+### Variáveis principais
 
 ```bash
-# Verificar status
-./check-system.sh
+DATABASE_URL=postgresql://user:pass@localhost:5432/pii_detector
+OPENAI_API_KEY=sk-sua-chave  # opcional
+MAX_FILE_SIZE=104857600
+ENABLE_SEMANTIC_ANALYSIS=true
+```
 
-# Ver logs
-tail -f /home/piidetector/logs/app.log
+### Comandos úteis
+
+```bash
+# Status da aplicação
+pm2 list
+pm2 logs pii-detector
+
+# Verificar serviços  
+systemctl status postgresql redis-server nginx
 
 # Backup
-./backup.sh
+pg_dump pii_detector > backup.sql
+```
 
-# Reiniciar
-pm2 restart pii-detector
+## Tipos de Dados Detectados
+
+- CPF (Cadastro de Pessoa Física)
+- CNPJ (Cadastro Nacional da Pessoa Jurídica)
+- RG (Registro Geral)
+- Email, Telefone, CEP
+- PIS/PASEP, NIRE
+
+## Desenvolvimento
+
+```bash
+npm install
+npm run db:push
+npm run dev
 ```
 
 ## Acesso
 
-Após instalação: `http://SEU_IP_SERVIDOR`
+Após instalação: `http://seu-servidor/`
+
+Para SSL: `certbot --nginx -d seu-dominio.com`
+
+## Licença
+
+MIT License
+
+---
+
+Desenvolvido por E-NESS
