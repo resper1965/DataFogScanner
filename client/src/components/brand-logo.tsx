@@ -12,7 +12,7 @@ export function BrandLogo({ className = "", size = "md" }: BrandLogoProps) {
   }
 
   return (
-    <div className={`font-bold tracking-tight ${sizeClasses[size]} ${className}`}>
+    <div className={`font-medium tracking-tight ${sizeClasses[size]} ${className}`}>
       <span className="text-foreground">n</span>
       <span style={{ color: '#00ADE0' }}>.</span>
       <span className="text-foreground">PIIdetector</span>

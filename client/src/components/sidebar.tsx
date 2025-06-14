@@ -28,7 +28,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
           </div>
           <div>
             <BrandLogo size="lg" className="mb-2" />
-            <p className="text-base text-muted-foreground">Proteção de Dados</p>
+            <p className="text-base text-muted-foreground">Resposta a Incidente</p>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       
       {/* User Section */}
       <div className="p-4 border-t border-border">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 mb-4">
           <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
             <User className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -69,6 +69,13 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <p className="text-sm font-medium text-foreground">Usuário</p>
             <p className="text-xs text-muted-foreground">Administrador</p>
           </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">
+            powered by <span className="font-medium">ness<span style={{ color: '#00ADE0' }}>.</span></span>
+          </p>
         </div>
       </div>
     </div>
