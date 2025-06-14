@@ -41,6 +41,7 @@ O script automaticamente:
 - **URL**: http://monster.e-ness.com.br
 - **Usuário**: piidetector
 - **Diretório**: /home/piidetector/pii-detector
+- **Configuração**: o arquivo `.env` é gerado em `/opt/n-piidetector/.env`
 
 ## Comandos Úteis
 
