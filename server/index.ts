@@ -1,5 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import RedisStore from "connect-redis";
+import { createClient } from "redis";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { sftpMonitor } from "./sftp-monitor";
@@ -8,17 +10,47 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session configuration
-app.use(session({
+// Redis client configuration for sessions
+const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
+
+redisClient.on('error', (err) => {
+  console.error('Redis Client Error:', err);
+});
+
+redisClient.on('connect', () => {
+  console.log('Redis connected for session storage');
+});
+
+// Connect to Redis
+redisClient.connect().catch(console.error);
+
+// Session configuration with Redis store for production
+const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'pii-detector-secret-key-2024',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to true in production with HTTPS
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
-}));
+};
+
+// Use Redis store in production, memory store in development
+if (process.env.NODE_ENV === 'production') {
+  sessionConfig.store = new RedisStore({
+    client: redisClient,
+    prefix: 'pii-detector:sess:',
+    ttl: 24 * 60 * 60 // 24 hours in seconds
+  });
+  console.log('Using Redis session store for production');
+} else {
+  console.log('Using memory session store for development');
+}
+
+app.use(session(sessionConfig));
 
 app.use((req, res, next) => {
   const start = Date.now();
