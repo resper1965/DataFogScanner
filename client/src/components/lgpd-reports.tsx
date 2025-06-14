@@ -174,9 +174,18 @@ export default function LGPDReports() {
   // Aplicar filtros
   const filteredReports = dataSubjectReports.filter(report => {
     if (filters.ownerName && !report.ownerName.toLowerCase().includes(filters.ownerName.toLowerCase())) return false;
-    if (filters.riskLevel && report.riskLevel !== filters.riskLevel) return false;
-    if (filters.retentionStatus && report.retentionStatus !== filters.retentionStatus) return false;
-    if (filters.consentStatus && report.consentStatus !== filters.consentStatus) return false;
+    if (filters.riskLevel && filters.riskLevel !== 'all' && report.riskLevel !== filters.riskLevel) return false;
+    if (filters.retentionStatus && filters.retentionStatus !== 'all' && report.retentionStatus !== filters.retentionStatus) return false;
+    if (filters.consentStatus && filters.consentStatus !== 'all' && report.consentStatus !== filters.consentStatus) return false;
+    if (filters.lgpdCategory && filters.lgpdCategory !== 'all') {
+      const categoryMap = {
+        'personal_data': ['CPF', 'RG', 'EMAIL'],
+        'sensitive_data': ['MEDICAL', 'BIOMETRIC'],
+        'children_data': ['CHILDREN_DATA']
+      };
+      const requiredTypes = categoryMap[filters.lgpdCategory];
+      if (!report.dataTypes.some(type => requiredTypes.includes(type))) return false;
+    }
     return true;
   });
 
@@ -495,7 +504,7 @@ export default function LGPDReports() {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="high">Alto</SelectItem>
                     <SelectItem value="medium">Médio</SelectItem>
                     <SelectItem value="low">Baixo</SelectItem>
@@ -510,7 +519,7 @@ export default function LGPDReports() {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="active">Ativo</SelectItem>
                     <SelectItem value="expired">Expirado</SelectItem>
                     <SelectItem value="pending_deletion">Pendente Exclusão</SelectItem>
@@ -525,7 +534,7 @@ export default function LGPDReports() {
                     <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="granted">Concedido</SelectItem>
                     <SelectItem value="revoked">Revogado</SelectItem>
                     <SelectItem value="pending">Pendente</SelectItem>
@@ -540,7 +549,7 @@ export default function LGPDReports() {
                     <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas</SelectItem>
+                    <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="personal_data">Dados Pessoais</SelectItem>
                     <SelectItem value="sensitive_data">Dados Sensíveis</SelectItem>
                     <SelectItem value="children_data">Dados de Menores</SelectItem>
