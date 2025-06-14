@@ -64,9 +64,8 @@ systemctl status postgresql redis-server nginx
 ├── client/          # Frontend React + TypeScript
 ├── server/          # Backend Node.js + Express
 ├── shared/          # Schemas e tipos compartilhados
-├── uploads/         # Arquivos carregados
-├── install.sh       # Script de instalação completa
-└── ecosystem.config.cjs # Configuração PM2
+├── attached_assets/ # Arquivos anexados
+└── install-production.sh # Script de instalação para produção
 ```
 
 ## Tecnologias
