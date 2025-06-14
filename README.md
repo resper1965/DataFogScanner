@@ -1,27 +1,30 @@
-# PII Detector - Sistema de Detecção de Dados Pessoais Brasileiro
+# n.PIIdetector
 
-Sistema completo de detecção de PII (Personally Identifiable Information) brasileiro com interface moderna e recursos avançados de conformidade LGPD.
+Sistema avançado de detecção de PII brasileiro com interface moderna e conformidade LGPD integrada.
 
-## Características
+## Instalação em VPS
 
-- **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
-- **Interface Moderna**: Design responsivo com Montserrat e componentes Radix UI
-- **LGPD Compliance**: Relatórios detalhados e gestão de conformidade
-- **Processamento Híbrido**: Regex + validação semântica via OpenAI
-- **Arquitetura Escalável**: React + Node.js + PostgreSQL + Redis
-
-## Instalação VPS
-
-Execute um único comando para instalação completa:
+Execute em sua VPS Ubuntu/Debian como root:
 
 ```bash
-# Clone o repositório
-git clone <repository-url> pii-detector
-cd pii-detector
-
-# Execute a instalação (como root)
-sudo ./install.sh
+curl -fsSL https://raw.githubusercontent.com/resper1965/DataFogScanner/main/install-production.sh | bash
 ```
+
+**Ou baixe e execute em etapas:**
+
+```bash
+wget https://raw.githubusercontent.com/resper1965/DataFogScanner/main/install-production.sh
+chmod +x install-production.sh
+sudo ./install-production.sh
+```
+
+## Características Principais
+
+- **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
+- **Interface Moderna**: React com tema escuro/claro
+- **LGPD Compliance**: Relatórios automáticos de conformidade
+- **Processamento**: PDF, DOC/DOCX, XLS/XLSX, TXT, CSV, XML
+- **Arquitetura**: Node.js + PostgreSQL + Redis + Nginx
 
 O script automaticamente:
 - Instala todas as dependências (Node.js, PostgreSQL, Redis, Nginx)
