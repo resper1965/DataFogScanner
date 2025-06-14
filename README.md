@@ -18,6 +18,8 @@ chmod +x install-production.sh
 sudo ./install-production.sh
 ```
 
+> **Nota**: o Node.js instalado pelo script já inclui o `npm`. Não instale o `npm` separadamente com `apt` para evitar conflitos.
+
 ## Características Principais
 
 - **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails

@@ -53,11 +53,18 @@ log "✓ Limpeza concluída"
 # ============================================================================
 # 2. INSTALAÇÃO DE DEPENDÊNCIAS
 # ============================================================================
+
 log "Instalando dependências do sistema..."
 
 export DEBIAN_FRONTEND=noninteractive
 apt update -qq 2>/dev/null
 apt install -y git curl build-essential postgresql postgresql-contrib redis-server nginx python3 python3-pip unzip rsync 2>/dev/null
+
+# Remover versões antigas do Node.js/npm para evitar conflitos
+if dpkg -s nodejs >/dev/null 2>&1 || dpkg -s npm >/dev/null 2>&1; then
+    warn "Removendo pacotes antigos do Node.js e npm..."
+    apt remove -y nodejs npm >/dev/null 2>&1 || true
+fi
 
 # Node.js 20
 if ! node -v 2>/dev/null | grep -q "v20"; then
