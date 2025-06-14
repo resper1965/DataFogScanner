@@ -9,6 +9,16 @@ export interface Notification {
   message: string;
   duration?: number;
   persistent?: boolean;
+  actions?: NotificationAction[];
+  category?: 'detection' | 'security' | 'system' | 'lgpd';
+  priority?: 'low' | 'medium' | 'high' | 'critical';
+  metadata?: Record<string, any>;
+}
+
+export interface NotificationAction {
+  label: string;
+  variant?: 'default' | 'destructive' | 'outline';
+  onClick: () => void;
 }
 
 interface NotificationItemProps {
@@ -62,12 +72,40 @@ function NotificationItem({ notification, onDismiss }: NotificationItemProps) {
       <div className="flex items-start gap-3">
         {getIcon()}
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {notification.title}
-          </h4>
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {notification.title}
+            </h4>
+            {notification.priority && (
+              <span className={`
+                px-2 py-1 text-xs rounded-full font-medium
+                ${notification.priority === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : ''}
+                ${notification.priority === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' : ''}
+                ${notification.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
+                ${notification.priority === 'low' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' : ''}
+              `}>
+                {notification.priority}
+              </span>
+            )}
+          </div>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
             {notification.message}
           </p>
+          {notification.actions && notification.actions.length > 0 && (
+            <div className="flex gap-2 mt-3">
+              {notification.actions.map((action, index) => (
+                <Button
+                  key={index}
+                  size="sm"
+                  variant={action.variant || 'outline'}
+                  onClick={action.onClick}
+                  className="text-xs"
+                >
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
         <Button
           variant="ghost"
@@ -141,6 +179,64 @@ export class NotificationManager {
 
   info(title: string, message: string, options?: Partial<Notification>) {
     return this.add({ type: 'info', title, message, ...options });
+  }
+
+  // Notificações específicas para detecção PII/LGPD
+  piiDetected(count: number, riskLevel: 'high' | 'medium' | 'low', fileName: string, onViewReport?: () => void) {
+    const actions = onViewReport ? [
+      { label: 'Ver Relatório', variant: 'default' as const, onClick: onViewReport }
+    ] : undefined;
+
+    return this.add({
+      type: riskLevel === 'high' ? 'error' : riskLevel === 'medium' ? 'warning' : 'info',
+      title: `${count} dado${count > 1 ? 's' : ''} PII detectado${count > 1 ? 's' : ''}`,
+      message: `Arquivo: ${fileName} - Nível de risco: ${riskLevel}`,
+      category: 'detection',
+      priority: riskLevel === 'high' ? 'critical' : riskLevel === 'medium' ? 'high' : 'medium',
+      actions,
+      persistent: riskLevel === 'high',
+      duration: riskLevel === 'high' ? 0 : 8000
+    });
+  }
+
+  lgpdCompliance(type: 'data_subject_request' | 'retention_warning' | 'consent_required', details: string, onAction?: () => void) {
+    const titles = {
+      data_subject_request: 'Solicitação do Titular',
+      retention_warning: 'Aviso de Retenção',
+      consent_required: 'Consentimento Necessário'
+    };
+
+    const actions = onAction ? [
+      { label: 'Ação Necessária', variant: 'default' as const, onClick: onAction }
+    ] : undefined;
+
+    return this.add({
+      type: 'warning',
+      title: titles[type],
+      message: details,
+      category: 'lgpd',
+      priority: 'high',
+      actions,
+      persistent: true,
+      duration: 0
+    });
+  }
+
+  securityAlert(threat: string, severity: 'critical' | 'high' | 'medium', onQuarantine?: () => void) {
+    const actions = onQuarantine ? [
+      { label: 'Quarentena', variant: 'destructive' as const, onClick: onQuarantine }
+    ] : undefined;
+
+    return this.add({
+      type: 'error',
+      title: 'Alerta de Segurança',
+      message: `Ameaça detectada: ${threat}`,
+      category: 'security',
+      priority: severity,
+      actions,
+      persistent: true,
+      duration: 0
+    });
   }
 }
 

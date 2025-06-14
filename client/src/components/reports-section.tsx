@@ -46,6 +46,11 @@ interface ReportFilters {
   cpfPattern?: string;
   cnpjPattern?: string;
   contextSearch?: string;
+  ownerName?: string;
+  documentType?: string;
+  lgpdCategory?: 'personal_data' | 'sensitive_data' | 'children_data';
+  retentionStatus?: 'active' | 'expired' | 'pending_deletion';
+  consentStatus?: 'granted' | 'revoked' | 'pending';
 }
 
 interface DetectionStats {
@@ -54,6 +59,40 @@ interface DetectionStats {
   byType: { [key: string]: number };
   byDate: { date: string; count: number }[];
   topPatterns: { pattern: string; count: number }[];
+  byOwner: { ownerName: string; count: number; riskLevel: string }[];
+  lgpdCompliance: {
+    personalData: number;
+    sensitiveData: number;
+    childrenData: number;
+    retentionViolations: number;
+    consentRequired: number;
+  };
+}
+
+interface LGPDReport {
+  dataSubjectRights: {
+    access: number;
+    rectification: number;
+    erasure: number;
+    portability: number;
+    objection: number;
+  };
+  retentionAnalysis: {
+    withinPolicy: number;
+    nearExpiry: number;
+    overdue: number;
+  };
+  consentTracking: {
+    valid: number;
+    expired: number;
+    revoked: number;
+    missing: number;
+  };
+  riskAssessment: {
+    highRisk: number;
+    mediumRisk: number;
+    lowRisk: number;
+  };
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -464,6 +503,67 @@ export default function ReportsSection() {
                 <p className="text-xs text-muted-foreground">
                   Busca CNPJs que contenham o padrão especificado
                 </p>
+              </div>
+
+              {/* Owner Name Filter */}
+              <div className="space-y-2">
+                <Label>Nome do Titular</Label>
+                <Input
+                  placeholder="Nome da pessoa..."
+                  onChange={(e) => setFilters(prev => ({ ...prev, ownerName: e.target.value }))}
+                  value={filters.ownerName || ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Filtra por nome do titular dos dados
+                </p>
+              </div>
+
+              {/* LGPD Category Filter */}
+              <div className="space-y-2">
+                <Label>Categoria LGPD</Label>
+                <Select onValueChange={(value) => setFilters(prev => ({ ...prev, lgpdCategory: value as any }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="personal_data">Dados Pessoais</SelectItem>
+                    <SelectItem value="sensitive_data">Dados Sensíveis</SelectItem>
+                    <SelectItem value="children_data">Dados de Menores</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Retention Status Filter */}
+              <div className="space-y-2">
+                <Label>Status de Retenção</Label>
+                <Select onValueChange={(value) => setFilters(prev => ({ ...prev, retentionStatus: value as any }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="expired">Expirado</SelectItem>
+                    <SelectItem value="pending_deletion">Pendente Exclusão</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Consent Status Filter */}
+              <div className="space-y-2">
+                <Label>Status do Consentimento</Label>
+                <Select onValueChange={(value) => setFilters(prev => ({ ...prev, consentStatus: value as any }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="granted">Concedido</SelectItem>
+                    <SelectItem value="revoked">Revogado</SelectItem>
+                    <SelectItem value="pending">Pendente</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Context Search */}
