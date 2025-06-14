@@ -217,10 +217,35 @@ if [ ! -f "package.json" ]; then
         echo "✅ Código baixado com sucesso"
         
         echo "📦 Instalando dependências..."
-        npm install --production
+        npm install
         
         echo "🗄️ Configurando banco de dados..."
         npm run db:push
+        
+        # Criar configuração PM2 com tsx
+        cat > ecosystem.config.js << 'EOFPM2'
+module.exports = {
+  apps: [{
+    name: 'pii-detector',
+    script: 'server/index.ts',
+    interpreter: 'tsx',
+    cwd: '/home/piidetector/pii-detector',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 5000
+    },
+    log_file: '/home/piidetector/logs/app.log',
+    error_file: '/home/piidetector/logs/error.log',
+    out_file: '/home/piidetector/logs/out.log',
+    env_file: '/home/piidetector/config/.env',
+    max_restarts: 10,
+    min_uptime: '10s',
+    max_memory_restart: '1G'
+  }]
+};
+EOFPM2
         
     else
         echo "❌ Erro ao baixar código da aplicação"
