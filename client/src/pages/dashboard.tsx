@@ -1,18 +1,90 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Sidebar from "@/components/sidebar";
 import UploadSection from "@/components/upload-section";
 import ProcessingDashboard from "@/components/processing-dashboard";
 import ResultsSection from "@/components/results-section";
 import CaseConfiguration from "@/components/case-configuration";
 import ReportsSection from "@/components/reports-section";
+import LGPDReports from "@/components/lgpd-reports";
 import SettingsSection from "@/components/settings-section";
 import type { Case } from "@shared/schema";
-import { Bell, Wifi } from "lucide-react";
+import { Bell, Wifi, AlertTriangle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { notifications } from "@/components/ui/notification-system";
+import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("upload");
   const [currentCase, setCurrentCase] = useState<Case | null>(null);
+
+  // Buscar dados para notificações LGPD
+  const { data: detections = [] } = useQuery({
+    queryKey: ["/api/detections"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+  });
+
+  // Calcular notificações baseadas em dados reais
+  const lgpdNotifications = useMemo(() => {
+    const detectionsArray = detections as any[];
+    const highRiskDetections = detectionsArray.filter(d => d.riskLevel === 'high').length;
+    const totalDetections = detectionsArray.length;
+    
+    const notifications = [];
+    
+    if (highRiskDetections > 0) {
+      notifications.push({
+        id: 'high-risk',
+        type: 'error' as const,
+        title: `${highRiskDetections} dados de alto risco`,
+        description: 'Requerem ação imediata para conformidade LGPD',
+        action: () => setActiveSection('lgpd')
+      });
+    }
+    
+    if (totalDetections > 50) {
+      notifications.push({
+        id: 'volume-alert',
+        type: 'warning' as const,
+        title: 'Alto volume de dados detectados',
+        description: 'Revisar política de retenção',
+        action: () => setActiveSection('lgpd')
+      });
+    }
+
+    return notifications;
+  }, [detections]);
+
+  // Demonstrar notificações funcionais
+  const handleTestNotifications = () => {
+    // Notificação de detecção PII
+    notifications.piiDetected(
+      5, 
+      'high', 
+      'documento-confidencial.pdf',
+      () => setActiveSection('search')
+    );
+
+    // Notificação LGPD
+    setTimeout(() => {
+      notifications.lgpdCompliance(
+        'retention_warning',
+        'Dados pessoais próximos ao vencimento de retenção',
+        () => setActiveSection('lgpd')
+      );
+    }, 2000);
+
+    // Alerta de segurança
+    setTimeout(() => {
+      notifications.securityAlert(
+        'Arquivo suspeito detectado',
+        'high',
+        () => setActiveSection('settings')
+      );
+    }, 4000);
+  };
 
   return (
     <div className="flex h-screen bg-background-app">
@@ -28,6 +100,7 @@ export default function Dashboard() {
                 {activeSection === "dashboard" && "Dashboard"}
                 {activeSection === "search" && "Buscar Dados"}
                 {activeSection === "reports" && "Relatórios"}
+                {activeSection === "lgpd" && "Conformidade LGPD"}
                 {activeSection === "settings" && "Configurações"}
               </h2>
               <p className="text-muted-foreground mt-1">
@@ -35,6 +108,7 @@ export default function Dashboard() {
                 {activeSection === "dashboard" && "Acompanhe o processamento em tempo real"}
                 {activeSection === "search" && "Busque e analise dados sensíveis detectados"}
                 {activeSection === "reports" && "Visualize relatórios de detecção de dados"}
+                {activeSection === "lgpd" && "Relatórios e gestão de conformidade LGPD"}
                 {activeSection === "settings" && "Configure padrões e preferências"}
               </p>
             </div>
