@@ -1,0 +1,109 @@
+
+/home/piidetector/logs/error-0.log last 10 lines:
+0|pii-dete | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-dete |     throw new Error(
+0|pii-dete |           ^
+0|pii-dete | 
+0|pii-dete | 
+0|pii-dete | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-dete |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-dete |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-dete | 
+0|pii-dete | Node.js v20.19.2
+
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
+0|pii-detector  | Warning: connect.session() MemoryStore is not
+0|pii-detector  | designed for a production environment, as it will leak
+0|pii-detector  | memory, and will not scale past a single process.
+0|pii-detector  | Iniciando monitoramento SFTP...
+0|pii-detector  | Diretórios SFTP criados/verificados
+0|pii-detector  | /home/piidetector/pii-detector/server/vite.ts:74
+0|pii-detector  |     throw new Error(
+0|pii-detector  |           ^
+0|pii-detector  | Error: Could not find the build directory: /home/piidetector/pii-detector/server/public, make sure to build the client first
+0|pii-detector  |     at serveStatic (/home/piidetector/pii-detector/server/vite.ts:74:11)
+0|pii-detector  |     at <anonymous> (/home/piidetector/pii-detector/server/index.ts:77:5)
+0|pii-detector  | Node.js v20.19.2
