@@ -25,6 +25,16 @@ log "Configurando Python com ambiente virtual..."
 # Instalar pipx e dependências
 apt install -y pipx python3-full
 
+# Instalar Node.js e ferramentas se não estiverem instalados
+if ! command -v node &> /dev/null; then
+    log "Instalando Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt install -y nodejs
+fi
+
+# Instalar ferramentas TypeScript e PM2
+npm install -g pm2 tsx typescript
+
 # Criar ambiente virtual para piidetector
 log "Criando ambiente virtual Python..."
 sudo -u piidetector python3 -m venv /home/piidetector/venv

@@ -212,10 +212,10 @@ install_nodejs() {
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     apt install -y nodejs
     
-    # PM2
-    npm install -g pm2
+    # PM2 e ferramentas TypeScript
+    npm install -g pm2 tsx typescript
     
-    log "Node.js e PM2 instalados"
+    log "Node.js, PM2 e ferramentas TypeScript instalados"
 }
 
 # Instalar Python
@@ -454,7 +454,7 @@ if [ ! -f "package.json" ]; then
         
         # Instalar dependências
         echo "📦 Instalando dependências..."
-        npm install --production
+        npm install
         
         # Executar migrações do banco
         echo "🗄️  Configurando banco de dados..."
@@ -476,10 +476,11 @@ cat > ecosystem.config.js << 'EOE'
 module.exports = {
   apps: [{
     name: 'pii-detector',
-    script: 'server/index.js',
+    script: 'server/index.ts',
+    interpreter: 'tsx',
     cwd: '/home/piidetector/pii-detector',
-    instances: 2,
-    exec_mode: 'cluster',
+    instances: 1,
+    exec_mode: 'fork',
     env: {
       NODE_ENV: 'production',
       PORT: 5000
@@ -489,8 +490,10 @@ module.exports = {
     out_file: '/home/piidetector/logs/out.log',
     env_file: '/home/piidetector/config/.env',
     max_restarts: 10,
-    min_uptime: '30s',
-    max_memory_restart: '1G'
+    min_uptime: '10s',
+    max_memory_restart: '1G',
+    watch: false,
+    ignore_watch: ["node_modules", "logs", "uploads"]
   }]
 };
 EOE

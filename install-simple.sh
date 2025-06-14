@@ -64,7 +64,7 @@ systemctl start redis-server
 echo "📦 Instalando Node.js..."
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
-npm install -g pm2
+npm install -g pm2 tsx typescript
 
 # Instalar Python packages
 echo "🐍 Instalando packages Python..."
@@ -181,7 +181,8 @@ if [ -f "package.json" ]; then
 module.exports = {
   apps: [{
     name: 'pii-detector',
-    script: 'server/index.js',
+    script: 'server/index.ts',
+    interpreter: 'tsx',
     cwd: '/home/piidetector/pii-detector',
     instances: 1,
     exec_mode: 'fork',
@@ -192,7 +193,10 @@ module.exports = {
     log_file: '/home/piidetector/logs/app.log',
     error_file: '/home/piidetector/logs/error.log',
     out_file: '/home/piidetector/logs/out.log',
-    env_file: '/home/piidetector/config/.env'
+    env_file: '/home/piidetector/config/.env',
+    max_restarts: 10,
+    min_uptime: '10s',
+    max_memory_restart: '1G'
   }]
 };
 EOFPM2
