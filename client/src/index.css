@@ -77,26 +77,114 @@
 }
 
 @layer components {
+  /* Design System - Sombras suaves conforme especificação */
   .card-shadow {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
   
   .card-shadow:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 12px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
   
+  .shadow-soft {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+  
+  .shadow-medium {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-strong {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Cards modernos com border-radius: 1rem */
+  .card-modern {
+    @apply bg-surface border border-border rounded-2xl shadow-soft;
+    @apply p-8 md:p-10; /* Espaçamento generoso */
+    border-radius: 1rem;
+  }
+  
+  /* Espaçamento generoso para containers */
+  .container-generous {
+    @apply px-8 md:px-12 lg:px-16 py-10 md:py-14;
+  }
+  
+  /* Layouts com muito respiro */
+  .layout-breathe > * {
+    @apply mb-8 md:mb-12;
+  }
+  
+  .layout-breathe > *:last-child {
+    @apply mb-0;
+  }
+  
+  /* Tipografia Montserrat limpa */
+  .text-clean {
+    font-family: 'Montserrat', sans-serif;
+    @apply leading-relaxed tracking-tight;
+  }
+  
+  /* Botões com design moderno */
+  .btn-primary {
+    @apply bg-primary hover:bg-primary text-primary-foreground;
+    @apply px-8 py-4 rounded-2xl font-medium transition-all duration-200;
+    @apply shadow-soft hover:shadow-medium;
+    border-radius: 1rem;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* Upload zone com design moderno */
   .upload-zone {
     transition: all 0.3s ease;
     border: 2px dashed hsl(var(--border));
+    border-radius: 1rem;
+    @apply p-12 md:p-16; /* Espaçamento muito generoso */
   }
   
   .upload-zone:hover {
     border-color: hsl(var(--primary));
     background-color: hsl(var(--primary) / 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
   
   .upload-zone.dragover {
     border-color: hsl(var(--primary));
     background-color: hsl(var(--primary) / 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Estados de foco modernos */
+  .focus-modern {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-4;
+    @apply focus:ring-offset-background;
+  }
+  
+  /* Superfícies com white-space */
+  .surface {
+    @apply bg-surface;
+  }
+  
+  .surface-secondary {
+    @apply bg-secondary;
+  }
+  
+  /* Inputs com design moderno */
+  .input-modern {
+    @apply bg-surface border border-border rounded-2xl px-6 py-4;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+    @apply shadow-soft transition-all duration-200;
+    border-radius: 1rem;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  /* Headers com espaçamento generoso */
+  .header-generous {
+    @apply py-8 md:py-12 px-8 md:px-12;
+  }
+  
+  /* Grid com gaps generosos */
+  .grid-generous {
+    @apply gap-8 md:gap-12;
   }
 }

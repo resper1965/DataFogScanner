@@ -174,24 +174,22 @@ export default function Dashboard() {
         </header>
         
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 overflow-auto container-generous">
+          <div className="max-w-7xl mx-auto layout-breathe">
             {activeSection === "upload" && (
-              <div className="space-y-6">
+              <div className="grid-generous">
                 {/* Step 1: Case Configuration */}
-                <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-blue-500">
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                        1
-                      </div>
-                      <h3 className="text-lg font-semibold">Configurar Caso</h3>
+                <div className="card-modern border-l-4 border-l-primary">
+                  <div className="flex items-center mb-8">
+                    <div className="w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold mr-6" style={{borderRadius: '1rem'}}>
+                      1
                     </div>
-                    <CaseConfiguration 
-                      currentCase={currentCase}
-                      onCaseCreated={setCurrentCase}
-                    />
+                    <h3 className="text-2xl font-semibold text-clean">Configurar Caso</h3>
                   </div>
+                  <CaseConfiguration 
+                    currentCase={currentCase}
+                    onCaseCreated={setCurrentCase}
+                  />
                 </div>
 
                 {/* Step 2: Upload Files - Only show if case is configured */}
