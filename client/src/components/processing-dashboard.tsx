@@ -72,7 +72,7 @@ export default function ProcessingDashboard() {
   };
 
   const processingFiles = jobs || [];
-  const isProcessing = processingFiles.some((job: any) => job.status === 'processing');
+  const isProcessing = processingFiles.some((job) => job.status === 'processing');
 
   return (
     <Card className="card-shadow">
