@@ -39,13 +39,17 @@ const sessionConfig: any = {
 };
 
 // Use Redis store in production, memory store in development
-if (process.env.NODE_ENV === 'production') {
-  sessionConfig.store = new RedisStore({
-    client: redisClient,
-    prefix: 'pii-detector:sess:',
-    ttl: 24 * 60 * 60 // 24 hours in seconds
-  });
-  console.log('Using Redis session store for production');
+if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
+  try {
+    sessionConfig.store = new RedisStore({
+      client: redisClient,
+      prefix: 'pii-detector:sess:',
+      ttl: 24 * 60 * 60 // 24 hours in seconds
+    });
+    console.log('Using Redis session store for production');
+  } catch (error) {
+    console.log('Redis not available, falling back to memory store');
+  }
 } else {
   console.log('Using memory session store for development');
 }
