@@ -1,11 +1,12 @@
-import { 
+import {
   users, files, detections, cases, processingJobs,
-  type User, type InsertUser, 
+  type User, type InsertUser,
   type File, type InsertFile,
   type Detection, type InsertDetection,
   type Case, type InsertCase,
   type ProcessingJob, type InsertProcessingJob
 } from "@shared/schema";
+import { DatabaseStorage } from "./db-storage";
 
 export interface IStorage {
   // Users
@@ -263,4 +264,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
