@@ -194,46 +194,40 @@ export default function Dashboard() {
 
                 {/* Step 2: Upload Files - Only show if case is configured */}
                 {currentCase && (
-                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-green-500">
-                    <div className="p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                          2
-                        </div>
-                        <h3 className="text-lg font-semibold">Upload de Arquivos</h3>
+                  <div className="card-modern border-l-4 border-l-green-500">
+                    <div className="flex items-center mb-8">
+                      <div className="w-12 h-12 bg-green-500 text-white flex items-center justify-center text-lg font-semibold mr-6" style={{borderRadius: '1rem'}}>
+                        2
                       </div>
-                      <UploadSection />
+                      <h3 className="text-2xl font-semibold text-clean">Upload de Arquivos</h3>
                     </div>
+                    <UploadSection />
                   </div>
                 )}
 
                 {/* Step 3: Processing Dashboard - Only show if files uploaded */}
                 {currentCase && (
-                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-yellow-500">
-                    <div className="p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                          3
-                        </div>
-                        <h3 className="text-lg font-semibold">Processamento</h3>
+                  <div className="card-modern border-l-4 border-l-yellow-500">
+                    <div className="flex items-center mb-8">
+                      <div className="w-12 h-12 bg-yellow-500 text-white flex items-center justify-center text-lg font-semibold mr-6" style={{borderRadius: '1rem'}}>
+                        3
                       </div>
-                      <ProcessingDashboard />
+                      <h3 className="text-2xl font-semibold text-clean">Processamento</h3>
                     </div>
+                    <ProcessingDashboard />
                   </div>
                 )}
 
                 {/* Step 4: Results - Only show if processing started */}
                 {currentCase && (
-                  <div className="bg-surface rounded-lg card-shadow border-l-4 border-l-purple-500">
-                    <div className="p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
-                          4
-                        </div>
-                        <h3 className="text-lg font-semibold">Resultados</h3>
+                  <div className="card-modern border-l-4 border-l-purple-500">
+                    <div className="flex items-center mb-8">
+                      <div className="w-12 h-12 bg-purple-500 text-white flex items-center justify-center text-lg font-semibold mr-6" style={{borderRadius: '1rem'}}>
+                        4
                       </div>
-                      <ResultsSection />
+                      <h3 className="text-2xl font-semibold text-clean">Resultados</h3>
                     </div>
+                    <ResultsSection />
                   </div>
                 )}
               </div>

@@ -100,7 +100,7 @@
   
   /* Cards modernos com border-radius: 1rem */
   .card-modern {
-    @apply bg-surface border border-border rounded-2xl shadow-soft;
+    @apply bg-card border border-border shadow-soft;
     @apply p-8 md:p-10; /* Espaçamento generoso */
     border-radius: 1rem;
   }
@@ -162,7 +162,7 @@
   
   /* Superfícies com white-space */
   .surface {
-    @apply bg-surface;
+    @apply bg-card;
   }
   
   .surface-secondary {
@@ -171,7 +171,7 @@
   
   /* Inputs com design moderno */
   .input-modern {
-    @apply bg-surface border border-border rounded-2xl px-6 py-4;
+    @apply bg-card border border-border px-6 py-4;
     @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
     @apply shadow-soft transition-all duration-200;
     border-radius: 1rem;

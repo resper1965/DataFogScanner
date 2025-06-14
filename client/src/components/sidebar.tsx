@@ -18,18 +18,18 @@ const navigationItems = [
 
 export default function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   return (
-    <div className="w-64 bg-surface shadow-lg flex flex-col border-r border-border">
+    <div className="w-80 surface shadow-soft flex flex-col border-r border-border">
       {/* Logo Section */}
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <Shield className="text-primary-foreground text-lg" />
+      <div className="header-generous border-b border-border">
+        <div className="flex items-center space-x-4">
+          <div className="w-14 h-14 bg-primary flex items-center justify-center" style={{borderRadius: '1rem'}}>
+            <Shield className="text-primary-foreground text-xl" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+            <h1 className="text-2xl font-bold text-clean">
               ness<span style={{ color: '#00ade0' }}>.</span>
             </h1>
-            <p className="text-sm text-muted-foreground">Proteção de Dados</p>
+            <p className="text-base text-muted-foreground">Proteção de Dados</p>
           </div>
         </div>
       </div>
