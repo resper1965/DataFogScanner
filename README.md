@@ -33,26 +33,26 @@ O script automaticamente:
 - Configura usuário `piidetector`
 - Configura banco de dados e sessões Redis
 - Faz build da aplicação
-- Configura PM2 e Nginx
+- Configura systemd e Nginx
 - Inicia todos os serviços
 
 ## Acesso
 
 - **URL**: http://monster.e-ness.com.br
 - **Usuário**: piidetector
-- **Diretório**: /home/piidetector/pii-detector
+- **Diretório**: /opt/n-piidetector
 
 ## Comandos Úteis
 
 ```bash
 # Status da aplicação
-sudo -u piidetector pm2 list
+systemctl status n-piidetector
 
 # Logs da aplicação
-sudo -u piidetector pm2 logs pii-detector
+journalctl -u n-piidetector -f
 
 # Reiniciar aplicação
-sudo -u piidetector pm2 restart pii-detector
+systemctl restart n-piidetector
 
 # Status dos serviços
 systemctl status postgresql redis-server nginx
