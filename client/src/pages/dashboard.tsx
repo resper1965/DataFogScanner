@@ -113,13 +113,56 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              {/* Notification Bell */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-xs text-destructive-foreground flex items-center justify-center">
-                  3
-                </span>
-              </Button>
+              {/* Notification Bell with Functional Dropdown */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-5 w-5" />
+                    {lgpdNotifications.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-xs text-destructive-foreground flex items-center justify-center">
+                        {lgpdNotifications.length}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="end">
+                  <div className="p-4 border-b">
+                    <h4 className="font-semibold text-sm">Notificações LGPD</h4>
+                    <p className="text-xs text-muted-foreground">Alertas de conformidade</p>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {lgpdNotifications.length > 0 ? (
+                      lgpdNotifications.map((notif) => (
+                        <div key={notif.id} className="p-4 border-b hover:bg-muted/50 cursor-pointer" onClick={notif.action}>
+                          <div className="flex items-start space-x-3">
+                            {notif.type === 'error' ? (
+                              <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5" />
+                            ) : (
+                              <Shield className="h-4 w-4 text-yellow-500 mt-0.5" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">{notif.title}</p>
+                              <p className="text-xs text-muted-foreground">{notif.description}</p>
+                              <Badge variant={notif.type === 'error' ? 'destructive' : 'secondary'} className="text-xs mt-2">
+                                {notif.type === 'error' ? 'Crítico' : 'Atenção'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-sm text-muted-foreground">
+                        Nenhuma notificação pendente
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 border-t">
+                    <Button size="sm" variant="outline" onClick={handleTestNotifications} className="w-full">
+                      Testar Notificações
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
               
               {/* Status Indicator */}
               <div className="flex items-center space-x-2">
@@ -200,6 +243,7 @@ export default function Dashboard() {
             {activeSection === "dashboard" && <ProcessingDashboard />}
             {activeSection === "search" && <ResultsSection />}
             {activeSection === "reports" && <ReportsSection />}
+            {activeSection === "lgpd" && <LGPDReports />}
             {activeSection === "settings" && <SettingsSection />}
           </div>
         </main>

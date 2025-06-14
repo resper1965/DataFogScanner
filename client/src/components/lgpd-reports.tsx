@@ -146,7 +146,7 @@ export default function LGPDReports() {
       
       if (reportMap.has(ownerName)) {
         const existing = reportMap.get(ownerName)!;
-        existing.dataTypes = [...new Set([...existing.dataTypes, detection.type])];
+        existing.dataTypes = Array.from(new Set([...existing.dataTypes, detection.type]));
         if (detection.riskLevel === 'high') existing.riskLevel = 'high';
         else if (detection.riskLevel === 'medium' && existing.riskLevel !== 'high') existing.riskLevel = 'medium';
       } else {

@@ -1,4 +1,4 @@
-import { Shield, Upload, BarChart3, Search, FileText, Settings, User } from "lucide-react";
+import { Shield, Upload, BarChart3, Search, FileText, Settings, User, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ const navigationItems = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
   { id: "search", label: "Buscar Dados", icon: Search },
   { id: "reports", label: "Relatórios", icon: FileText },
+  { id: "lgpd", label: "Conformidade LGPD", icon: Scale },
   { id: "settings", label: "Configurações", icon: Settings },
 ];
 
