@@ -64,6 +64,12 @@ apt install -y curl wget gnupg2 software-properties-common apt-transport-https \
     build-essential git nginx ufw fail2ban unzip python3 python3-pip \
     python3-venv postgresql postgresql-contrib redis-server
 
+# Remover versões antigas do Node.js/npm para evitar conflitos
+if dpkg -s nodejs >/dev/null 2>&1 || dpkg -s npm >/dev/null 2>&1; then
+    info "Removendo versões antigas do Node.js e npm..."
+    apt remove -y nodejs npm >/dev/null 2>&1 || true
+fi
+
 # ============================================================================
 # 3. INSTALAÇÃO DO NODE.JS
 # ============================================================================
