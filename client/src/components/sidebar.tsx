@@ -22,14 +22,9 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     <div className="w-80 surface shadow-soft flex flex-col border-r border-border">
       {/* Logo Section */}
       <div className="header-generous border-b border-border">
-        <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 bg-primary flex items-center justify-center" style={{borderRadius: '1rem'}}>
-            <Shield className="text-primary-foreground text-xl" />
-          </div>
-          <div>
-            <BrandLogo size="lg" className="mb-2" />
-            <p className="text-base text-muted-foreground">Resposta a Incidente</p>
-          </div>
+        <div className="flex flex-col">
+          <BrandLogo size="xl" className="mb-3" />
+          <p className="text-base text-muted-foreground">Resposta a Incidente</p>
         </div>
       </div>
       
