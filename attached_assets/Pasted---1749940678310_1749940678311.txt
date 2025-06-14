@@ -1,0 +1,740 @@
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+✓ Aplicação iniciada
+
+📋 Status dos Serviços:
+active
+✓ PostgreSQL ativo
+active
+✓ Redis ativo
+active
+✓ Nginx ativo
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/logs'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:133:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/pids'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:141:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.writeFileSync (node:fs:2368:20)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:149:10)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/modules'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:157:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.openSync (node:fs:574:18)
+    at Object.readFileSync (node:fs:453:35)
+    at Configuration.getAllSync (/usr/lib/node_modules/pm2/lib/Configuration.js:299:26)
+    at Configuration.getSync (/usr/lib/node_modules/pm2/lib/Configuration.js:270:30)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:116:44)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+node:fs:574
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/pm2.log'
+    at Object.openSync (node:fs:574:18)
+    at Client.launchDaemon (/usr/lib/node_modules/pm2/lib/Client.js:228:12)
+    at /usr/lib/node_modules/pm2/lib/Client.js:104:10
+    at /usr/lib/node_modules/pm2/lib/Client.js:318:14
+    at processTicksAndRejections (node:internal/process/task_queues:77:11)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at listOnTimeout (node:internal/timers:545:9)
+    at process.processTimers (node:internal/timers:519:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/piidetector/.pm2/pm2.log'
+}
+
+Node.js v20.19.2
+✗ Aplicação offline
+✗ API não responde
+
+🎉 Instalação Concluída!
+🌐 Acesse: http://monster.e-ness.com.br
+📋 Logs: sudo -u piidetector pm2 logs n-piidetector
+
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/logs'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:133:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/pids'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:141:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.writeFileSync (node:fs:2368:20)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:149:10)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/modules'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:157:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.openSync (node:fs:574:18)
+    at Object.readFileSync (node:fs:453:35)
+    at Configuration.getAllSync (/usr/lib/node_modules/pm2/lib/Configuration.js:299:26)
+    at Configuration.getSync (/usr/lib/node_modules/pm2/lib/Configuration.js:270:30)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:116:44)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+node:fs:574
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/pm2.log'
+    at Object.openSync (node:fs:574:18)
+    at Client.launchDaemon (/usr/lib/node_modules/pm2/lib/Client.js:228:12)
+    at /usr/lib/node_modules/pm2/lib/Client.js:104:10
+    at /usr/lib/node_modules/pm2/lib/Client.js:318:14
+    at processTicksAndRejections (node:internal/process/task_queues:77:11)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at listOnTimeout (node:internal/timers:545:9)
+    at process.processTimers (node:internal/timers:519:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/piidetector/.pm2/pm2.log'
+}
+
+Node.js v20.19.2
+root@monster:~# nano t.sh
+root@monster:~# chmod +x t.sh
+root@monster:~# ./t.sh
+🔧 Corrigindo PM2...
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+mkdir: cannot create directory ‘/home/piidetector’: Permission denied
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/logs'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:133:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/pids'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:141:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.writeFileSync (node:fs:2368:20)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:149:10)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/modules'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:157:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.openSync (node:fs:574:18)
+    at Object.readFileSync (node:fs:453:35)
+    at Configuration.getAllSync (/usr/lib/node_modules/pm2/lib/Configuration.js:299:26)
+    at Configuration.getSync (/usr/lib/node_modules/pm2/lib/Configuration.js:270:30)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:116:44)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+node:fs:574
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/pm2.log'
+    at Object.openSync (node:fs:574:18)
+    at Client.launchDaemon (/usr/lib/node_modules/pm2/lib/Client.js:228:12)
+    at /usr/lib/node_modules/pm2/lib/Client.js:104:10
+    at /usr/lib/node_modules/pm2/lib/Client.js:318:14
+    at processTicksAndRejections (node:internal/process/task_queues:77:11)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at listOnTimeout (node:internal/timers:545:9)
+    at process.processTimers (node:internal/timers:519:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/piidetector/.pm2/pm2.log'
+}
+
+Node.js v20.19.2
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/logs'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:133:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/pids'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:141:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.writeFileSync (node:fs:2368:20)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:149:10)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/modules'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:157:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.openSync (node:fs:574:18)
+    at Object.readFileSync (node:fs:453:35)
+    at Configuration.getAllSync (/usr/lib/node_modules/pm2/lib/Configuration.js:299:26)
+    at Configuration.getSync (/usr/lib/node_modules/pm2/lib/Configuration.js:270:30)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:116:44)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+node:fs:574
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/pm2.log'
+    at Object.openSync (node:fs:574:18)
+    at Client.launchDaemon (/usr/lib/node_modules/pm2/lib/Client.js:228:12)
+    at /usr/lib/node_modules/pm2/lib/Client.js:104:10
+    at /usr/lib/node_modules/pm2/lib/Client.js:318:14
+    at processTicksAndRejections (node:internal/process/task_queues:77:11)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at listOnTimeout (node:internal/timers:545:9)
+    at process.processTimers (node:internal/timers:519:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/piidetector/.pm2/pm2.log'
+}
+
+Node.js v20.19.2
+[PM2] Init System found: systemd
+Platform systemd
+Template
+[Unit]
+Description=PM2 process manager
+Documentation=https://pm2.keymetrics.io/
+After=network.target
+
+[Service]
+Type=forking
+User=piidetector
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+Environment=PM2_HOME=/home/piidetector/.pm2
+PIDFile=/home/piidetector/.pm2/pm2.pid
+Restart=on-failure
+
+ExecStart=/usr/lib/node_modules/pm2/bin/pm2 resurrect
+ExecReload=/usr/lib/node_modules/pm2/bin/pm2 reload all
+ExecStop=/usr/lib/node_modules/pm2/bin/pm2 kill
+
+[Install]
+WantedBy=multi-user.target
+
+Target path
+/etc/systemd/system/pm2-piidetector.service
+Command list
+[ 'systemctl enable pm2-piidetector' ]
+[PM2] Writing init configuration in /etc/systemd/system/pm2-piidetector.service
+[PM2] Making script booting at startup...
+[PM2] [-] Executing: systemctl enable pm2-piidetector...
+[PM2] [v] Command successfully executed.
++---------------------------------------+
+[PM2] Freeze a process list on reboot via:
+$ pm2 save
+
+[PM2] Remove init script via:
+$ pm2 unstartup systemd
+📋 Status Final:
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/logs'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:133:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/pids'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:141:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.writeFileSync (node:fs:2368:20)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:149:10)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+    at Module.require (node:internal/modules/cjs/loader:1298:19)
+Error: EACCES: permission denied, mkdir '/home/piidetector/.pm2/modules'
+    at Object.mkdirSync (node:fs:1372:26)
+    at mkdirpNativeSync (/usr/lib/node_modules/pm2/node_modules/mkdirp/lib/mkdirp-native.js:29:10)
+    at Function.mkdirpSync [as sync] (/usr/lib/node_modules/pm2/node_modules/mkdirp/index.js:21:7)
+    at Client.initFileStructure (/usr/lib/node_modules/pm2/lib/Client.js:157:25)
+    at new module.exports (/usr/lib/node_modules/pm2/lib/Client.js:38:8)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:107:19)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+
+                        -------------
+
+__/\\\\\\\\\\\\\____/\\\\____________/\\\\____/\\\\\\\\\_____
+ _\/\\\/////////\\\_\/\\\\\\________/\\\\\\__/\\\///////\\\___
+  _\/\\\_______\/\\\_\/\\\//\\\____/\\\//\\\_\///______\//\\\__
+   _\/\\\\\\\\\\\\\/__\/\\\\///\\\/\\\/_\/\\\___________/\\\/___
+    _\/\\\/////////____\/\\\__\///\\\/___\/\\\________/\\\//_____
+     _\/\\\_____________\/\\\____\///_____\/\\\_____/\\\//________
+      _\/\\\_____________\/\\\_____________\/\\\___/\\\/___________
+       _\/\\\_____________\/\\\_____________\/\\\__/\\\\\\\\\\\\\\\_
+        _\///______________\///______________\///__\///////////////__
+
+
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/module_conf.json'
+    at Object.openSync (node:fs:574:18)
+    at Object.readFileSync (node:fs:453:35)
+    at Configuration.getAllSync (/usr/lib/node_modules/pm2/lib/Configuration.js:299:26)
+    at Configuration.getSync (/usr/lib/node_modules/pm2/lib/Configuration.js:270:30)
+    at new API (/usr/lib/node_modules/pm2/lib/API.js:116:44)
+    at Object.<anonymous> (/usr/lib/node_modules/pm2/lib/binaries/CLI.js:27:11)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1096:12)
+node:fs:574
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/piidetector/.pm2/pm2.log'
+    at Object.openSync (node:fs:574:18)
+    at Client.launchDaemon (/usr/lib/node_modules/pm2/lib/Client.js:228:12)
+    at /usr/lib/node_modules/pm2/lib/Client.js:104:10
+    at /usr/lib/node_modules/pm2/lib/Client.js:318:14
+    at processTicksAndRejections (node:internal/process/task_queues:77:11)
+    at runNextTicks (node:internal/process/task_queues:64:3)
+    at listOnTimeout (node:internal/timers:545:9)
+    at process.processTimers (node:internal/timers:519:7) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/piidetector/.pm2/pm2.log'
+}
+
+Node.js v20.19.2
+❌ API com problemas
+active
+✅ Nginx ativo
+active
+✅ PostgreSQL ativo
+active
+✅ Redis ativo
