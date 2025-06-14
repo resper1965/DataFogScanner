@@ -1,5 +1,6 @@
 import { Shield, Upload, BarChart3, Search, FileText, Settings, User, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -26,9 +27,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <Shield className="text-primary-foreground text-xl" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-clean">
-              ness<span style={{ color: '#00ade0' }}>.</span>
-            </h1>
+            <BrandLogo size="lg" className="mb-2" />
             <p className="text-base text-muted-foreground">Proteção de Dados</p>
           </div>
         </div>

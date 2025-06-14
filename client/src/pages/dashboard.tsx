@@ -12,6 +12,7 @@ import { Bell, Wifi, AlertTriangle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { notifications } from "@/components/ui/notification-system";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
@@ -163,6 +164,9 @@ export default function Dashboard() {
                   </div>
                 </PopoverContent>
               </Popover>
+              
+              {/* Theme Toggle */}
+              <ThemeToggle />
               
               {/* Status Indicator */}
               <div className="flex items-center space-x-2">

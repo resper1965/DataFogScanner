@@ -10,21 +10,25 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Redis client configuration for sessions
-const redisClient = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379'
-});
+// Redis client configuration for sessions (only in production)
+let redisClient: any = null;
 
-redisClient.on('error', (err) => {
-  console.error('Redis Client Error:', err);
-});
+if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
+  redisClient = createClient({
+    url: process.env.REDIS_URL
+  });
 
-redisClient.on('connect', () => {
-  console.log('Redis connected for session storage');
-});
+  redisClient.on('error', (err) => {
+    console.error('Redis Client Error:', err);
+  });
 
-// Connect to Redis
-redisClient.connect().catch(console.error);
+  redisClient.on('connect', () => {
+    console.log('Redis connected for session storage');
+  });
+
+  // Connect to Redis only in production
+  redisClient.connect().catch(console.error);
+}
 
 // Session configuration with Redis store for production
 const sessionConfig: any = {
@@ -39,7 +43,7 @@ const sessionConfig: any = {
 };
 
 // Use Redis store in production, memory store in development
-if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
+if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL && redisClient) {
   try {
     sessionConfig.store = new RedisStore({
       client: redisClient,
