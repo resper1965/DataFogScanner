@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # ============================================================================
-# PII Detector - Script de Instalação Completa para VPS
+# n.PIIdetector - Script de Instalação Completa para VPS
 # ============================================================================
 # Sistema completo de detecção de PII brasileiro com interface moderna
+# Tema escuro/claro, branding ness, resposta a incidente
 # Domínio: monster.e-ness.com.br
 # Usuário: piidetector
 # ============================================================================
@@ -352,12 +353,14 @@ fi
 # 17. INFORMAÇÕES FINAIS
 # ============================================================================
 echo
-log "=== INSTALAÇÃO CONCLUÍDA ==="
+log "=== INSTALAÇÃO n.PIIdetector CONCLUÍDA ==="
 echo
-info "🌐 Domínio: http://$DOMAIN"
-info "📂 Diretório: $APP_DIR"
-info "👤 Usuário: $USER"
-info "🗄️  Database: $DB_NAME"
+info "Domínio: http://$DOMAIN"
+info "Diretório: $APP_DIR"
+info "Usuário: $USER"
+info "Database: $DB_NAME"
+info "Tema: Escuro/Claro disponível"
+info "Branding: n.PIIdetector - powered by ness."
 echo
 log "Comandos úteis:"
 echo "  • Logs da aplicação: sudo -u $USER pm2 logs pii-detector"
