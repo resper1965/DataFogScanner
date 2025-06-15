@@ -137,12 +137,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadedFiles.push(savedFile);
       }
 
-      res.json({ 
+      res.json({
         message: "Arquivos enviados com sucesso",
-        files: uploadedFiles 
+        files: uploadedFiles
       });
     } catch (error) {
       console.error("Erro no upload:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Extract files from uploaded ZIP
+  app.post("/api/files/extract", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
+      }
+
+      const zipPath = req.file.path;
+      if (path.extname(req.file.originalname).toLowerCase() !== '.zip') {
+        return res.status(400).json({ message: 'Apenas arquivos .zip são suportados' });
+      }
+
+      const extractedPaths = await extractZipFiles(zipPath);
+      const files = extractedPaths.map(p => ({ name: path.basename(p), path: p }));
+      res.json({ files });
+    } catch (error) {
+      console.error("Erro ao extrair zip:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
