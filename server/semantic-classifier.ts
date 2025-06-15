@@ -1,7 +1,11 @@
 import OpenAI from "openai";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openaiApiKey = process.env.OPENAI_API_KEY;
+if (!openaiApiKey) {
+  console.warn("OPENAI_API_KEY not set. Semantic analysis is disabled.");
+}
+const openai: OpenAI | null = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null;
 
 export interface SemanticDetection {
   type: string;
@@ -70,6 +74,10 @@ export class SemanticClassifier {
   }
 
   private async validateWithAI(candidate: RegexCandidate, fullText: string): Promise<{isValid: boolean, confidence: number}> {
+    if (!openai) {
+      console.warn('Skipping AI validation because OPENAI_API_KEY is not set.');
+      return { isValid: true, confidence: 0.7 };
+    }
     try {
       const contextStart = Math.max(0, candidate.position - 100);
       const contextEnd = Math.min(fullText.length, candidate.position + candidate.value.length + 100);
@@ -107,6 +115,10 @@ export class SemanticClassifier {
   }
 
   private async performSemanticAnalysis(text: string): Promise<SemanticDetection[]> {
+    if (!openai) {
+      console.warn('Skipping semantic analysis because OPENAI_API_KEY is not set.');
+      return [];
+    }
     try {
       // Truncate text if too long
       const analysisText = text.length > this.maxContextLength 
