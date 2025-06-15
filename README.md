@@ -44,6 +44,12 @@ O script automaticamente:
 - **Diretório**: /home/piidetector/pii-detector
 - **Configuração**: o arquivo `.env` é gerado em `/opt/n-piidetector/.env`
 
+## Variáveis de Ambiente
+
+Algumas configurações podem ser ajustadas no arquivo `.env` gerado durante a instalação.
+
+- `PORT`: porta que o servidor Express utiliza (padrão `5000`)
+
 ## Comandos Úteis
 
 ```bash
