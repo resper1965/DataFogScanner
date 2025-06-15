@@ -55,11 +55,12 @@ export class FileTextExtractor {
 import sys
 try:
     import PyPDF2
-    with open('${filePath}', 'rb') as file:
+    target_path = sys.argv[1]
+    with open(target_path, 'rb') as file:
         reader = PyPDF2.PdfReader(file)
         text = ''
         for page in reader.pages:
-            text += page.extract_text() + '\\n'
+            text += page.extract_text() + '\n'
         print(text)
 except Exception as e:
     print(f"Erro ao extrair PDF: {e}", file=sys.stderr)
@@ -70,7 +71,7 @@ except Exception as e:
       
       fs.writeFile(tempScript, scriptContent)
         .then(() => {
-          const pythonProcess = spawn('python', [tempScript]);
+          const pythonProcess = spawn('python', [tempScript, filePath]);
           let output = '';
           let errorOutput = '';
 
@@ -109,10 +110,11 @@ except Exception as e:
 import sys
 try:
     from docx import Document
-    doc = Document('${filePath}')
+    target_path = sys.argv[1]
+    doc = Document(target_path)
     text = ''
     for paragraph in doc.paragraphs:
-        text += paragraph.text + '\\n'
+        text += paragraph.text + '\n'
     print(text)
 except Exception as e:
     print(f"Erro ao extrair Word: {e}", file=sys.stderr)
@@ -123,7 +125,7 @@ except Exception as e:
       
       fs.writeFile(tempScript, scriptContent)
         .then(() => {
-          const pythonProcess = spawn('python', [tempScript]);
+          const pythonProcess = spawn('python', [tempScript, filePath]);
           let output = '';
           let errorOutput = '';
 
@@ -162,7 +164,8 @@ except Exception as e:
 import sys
 try:
     import openpyxl
-    workbook = openpyxl.load_workbook('${filePath}')
+    target_path = sys.argv[1]
+    workbook = openpyxl.load_workbook(target_path)
     text = ''
     for sheet_name in workbook.sheetnames:
         sheet = workbook[sheet_name]
@@ -182,7 +185,7 @@ except Exception as e:
       
       fs.writeFile(tempScript, scriptContent)
         .then(() => {
-          const pythonProcess = spawn('python', [tempScript]);
+          const pythonProcess = spawn('python', [tempScript, filePath]);
           let output = '';
           let errorOutput = '';
 

@@ -260,10 +260,10 @@ async function runDataFogDetection(
     try {
       const scriptContent = createDataFogScript(filePath, patterns, customRegex);
       const tempScriptPath = path.join(process.cwd(), 'temp_datafog_script.py');
-      
+
       fs.writeFile(tempScriptPath, scriptContent)
         .then(() => {
-          const pythonProcess = spawn('python', [tempScriptPath], {
+          const pythonProcess = spawn('python', [tempScriptPath, filePath], {
             stdio: ['pipe', 'pipe', 'pipe']
           });
 
@@ -440,7 +440,7 @@ def scan_with_regex(content, enabled_patterns):
 
 def main():
     try:
-        file_path = "${filePath}"
+        file_path = sys.argv[1]
         enabled_patterns = ${JSON.stringify(patterns)}
         
         # Extrair texto do arquivo
