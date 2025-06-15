@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFileSchema, insertProcessingJobSchema, insertDetectionSchema, insertCaseSchema } from "@shared/schema";
 import { authenticateUser, registerUser, loginSchema, registerSchema } from "./auth";
+import { ensureAuthenticated } from "./ensureAuthenticated";
 import multer from "multer";
 import path from "path";
 import { processFiles } from "./datafog-processor";
@@ -98,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload files endpoint
-  app.post("/api/files/upload", upload.any(), async (req, res) => {
+  app.post("/api/files/upload", ensureAuthenticated, upload.any(), async (req, res) => {
     try {
       if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
@@ -148,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Start processing endpoint
-  app.post("/api/processing/start", async (req, res) => {
+  app.post("/api/processing/start", ensureAuthenticated, async (req, res) => {
     try {
       const { fileIds, patterns, customRegex } = req.body;
       
@@ -186,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get files endpoint
-  app.get("/api/files", async (req, res) => {
+  app.get("/api/files", ensureAuthenticated, async (req, res) => {
     try {
       const files = await storage.getFiles();
       res.json(files);
@@ -197,7 +198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete specific file
-  app.delete("/api/files/:id", async (req, res) => {
+  app.delete("/api/files/:id", ensureAuthenticated, async (req, res) => {
     try {
       const fileId = parseInt(req.params.id);
       if (isNaN(fileId)) {
@@ -213,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Clear all files
-  app.delete("/api/files", async (req, res) => {
+  app.delete("/api/files", ensureAuthenticated, async (req, res) => {
     try {
       await storage.deleteAllFiles();
       res.json({ message: "Todos os arquivos foram removidos" });
@@ -224,7 +225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get processing jobs endpoint
-  app.get("/api/processing/jobs", async (req, res) => {
+  app.get("/api/processing/jobs", ensureAuthenticated, async (req, res) => {
     try {
       const jobs = await storage.getProcessingJobs();
       res.json(jobs);
@@ -235,7 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get detections endpoint
-  app.get("/api/detections", async (req, res) => {
+  app.get("/api/detections", ensureAuthenticated, async (req, res) => {
     try {
       const { fileId } = req.query;
       
@@ -254,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create detection endpoint
-  app.post("/api/detections", async (req, res) => {
+  app.post("/api/detections", ensureAuthenticated, async (req, res) => {
     try {
       const result = insertDetectionSchema.safeParse(req.body);
       if (!result.success) {
@@ -270,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get detection statistics for reports
-  app.get("/api/reports/stats", async (req, res) => {
+  app.get("/api/reports/stats", ensureAuthenticated, async (req, res) => {
     try {
       const detections = await storage.getAllDetections();
       const files = await storage.getFiles();
@@ -307,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Security scan endpoint
-  app.post("/api/files/:id/security-scan", async (req, res) => {
+  app.post("/api/files/:id/security-scan", ensureAuthenticated, async (req, res) => {
     try {
       const fileId = parseInt(req.params.id);
       const file = await storage.getFile(fileId);
@@ -336,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get processing statistics endpoint
-  app.get("/api/processing/stats", async (req, res) => {
+  app.get("/api/processing/stats", ensureAuthenticated, async (req, res) => {
     try {
       const jobs = await storage.getProcessingJobs();
       const files = await storage.getFiles();
@@ -362,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export report endpoint (JSON)
-  app.get("/api/reports/export", async (req, res) => {
+  app.get("/api/reports/export", ensureAuthenticated, async (req, res) => {
     try {
       const detections = await storage.getAllDetections();
       const files = await storage.getFiles();
@@ -395,7 +396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Export report endpoint (CSV)
-  app.get("/api/reports/export/csv", async (req, res) => {
+  app.get("/api/reports/export/csv", ensureAuthenticated, async (req, res) => {
     try {
       const detections = await storage.getAllDetections();
       const files = await storage.getFiles();
@@ -429,7 +430,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cases API routes
-  app.get("/api/cases", async (req, res) => {
+  app.get("/api/cases", ensureAuthenticated, async (req, res) => {
     try {
       const cases = await storage.getCases();
       res.json(cases);
@@ -438,7 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/cases", async (req, res) => {
+  app.post("/api/cases", ensureAuthenticated, async (req, res) => {
     try {
       // Parse the incident date from string to Date object
       const bodyWithParsedDate = {
@@ -458,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/cases/:id", async (req, res) => {
+  app.get("/api/cases/:id", ensureAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const case_ = await storage.getCase(id);
@@ -471,7 +472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/cases/:id", async (req, res) => {
+  app.put("/api/cases/:id", ensureAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       
