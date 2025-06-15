@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { storage } from './storage';
-import { getBrazilianPatterns } from '../client/src/lib/brazilian-patterns';
+import { getBrazilianPatterns } from '@shared/brazilian-patterns';
 import { fileTextExtractor } from './file-text-extractor';
 
 interface DetectionResult {
