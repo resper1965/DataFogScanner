@@ -283,7 +283,6 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     
     # Rate limiting
-    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
     
     location / {
         proxy_pass http://127.0.0.1:5000;
@@ -327,6 +326,11 @@ server {
         log_not_found off;
     }
 }
+EOF
+
+# Configuração de rate limit em contexto http
+cat > /etc/nginx/conf.d/ratelimit.conf << 'EOF'
+limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
 EOF
 
 # Testar configuração do Nginx
