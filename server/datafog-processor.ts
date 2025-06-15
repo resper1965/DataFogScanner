@@ -2,8 +2,9 @@ import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { storage } from './storage';
-import { getBrazilianPatterns } from '../client/src/lib/brazilian-patterns';
+import { getBrazilianPatterns } from '@shared/brazilian-patterns';
 import { fileTextExtractor } from './file-text-extractor';
+import { extractZipFiles } from './file-handler';
 
 interface DetectionResult {
   type: string;
@@ -50,13 +51,31 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
     console.log(`Iniciando extração de texto...`);
     await storage.updateProcessingJobStatus(jobId, 'processing', 25);
     
-    const extractionResult = await fileTextExtractor.extractText(filePath, file.mimeType);
-    
-    if (!extractionResult.success) {
-      throw new Error(`Falha na extração de texto: ${extractionResult.error}`);
+    const textsToProcess: string[] = [];
+
+    if (path.extname(filePath).toLowerCase() === '.zip') {
+      console.log('Arquivo ZIP detectado, extraindo...');
+      const extracted = await extractZipFiles(filePath);
+      for (const extractedPath of extracted) {
+        const result = await fileTextExtractor.extractText(extractedPath, '');
+        if (result.success && result.text) {
+          textsToProcess.push(result.text);
+        } else {
+          console.warn(`Falha ao extrair texto de ${extractedPath}`);
+        }
+      }
+      const extractDir = path.join(path.dirname(filePath), 'extracted', path.basename(filePath, '.zip'));
+      await fs.rm(extractDir, { recursive: true, force: true }).catch(() => {});
+    } else {
+      const extractionResult = await fileTextExtractor.extractText(filePath, file.mimeType);
+      if (!extractionResult.success) {
+        throw new Error(`Falha na extração de texto: ${extractionResult.error}`);
+      }
+      textsToProcess.push(extractionResult.text);
     }
 
-    console.log(`Texto extraído: ${extractionResult.text.length} caracteres`);
+    const totalChars = textsToProcess.reduce((acc, t) => acc + t.length, 0);
+    console.log(`Texto extraído: ${totalChars} caracteres`);
     
     // Extração concluída - 40%
     await storage.updateProcessingJobStatus(jobId, 'processing', 40);
@@ -73,8 +92,10 @@ async function processFileWithDataFog(jobId: number): Promise<void> {
     // Análise de dados - 60%
     await storage.updateProcessingJobStatus(jobId, 'processing', 60);
     
-    const detections = await runBrazilianDataDetection(extractionResult.text, job.fileId);
-    allDetections.push(...detections);
+    for (const text of textsToProcess) {
+      const detections = await runBrazilianDataDetection(text, job.fileId);
+      allDetections.push(...detections);
+    }
 
     console.log(`Detecções encontradas: ${allDetections.length}`);
     
@@ -252,8 +273,8 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
 }
 
 async function runDataFogDetection(
-  filePath: string, 
-  patterns: any, 
+  filePath: string,
+  patterns: string[],
   customRegex?: string
 ): Promise<DetectionResult[]> {
   return new Promise((resolve) => {
@@ -504,8 +525,16 @@ function parseDataFogOutput(output: string): DetectionResult[] {
     }
     
     const results = JSON.parse(jsonContent);
-    
-    return results.map((result: any) => ({
+
+    interface RawResult {
+      type: string;
+      value: string;
+      context: string;
+      position: number;
+      riskLevel: string;
+    }
+
+    return results.map((result: RawResult) => ({
       type: result.type,
       value: result.value,
       context: result.context,

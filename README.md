@@ -25,7 +25,7 @@ sudo ./install-production.sh
 - **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
 - **Interface Moderna**: React com tema escuro/claro
 - **LGPD Compliance**: Relatórios automáticos de conformidade
-- **Processamento**: PDF, DOC/DOCX, XLS/XLSX, TXT, CSV, XML
+- **Processamento**: PDF, DOC/DOCX, XLS/XLSX, TXT, CSV, XML, ZIP
 - **Arquitetura**: Node.js + PostgreSQL + Redis + Nginx
 
 O script automaticamente:
@@ -35,6 +35,7 @@ O script automaticamente:
 - Faz build da aplicação
 - Configura systemd e Nginx
 - Inicia todos os serviços
+- Executa `drizzle-kit push` se existirem migrations
 
 ## Acesso
 
@@ -42,6 +43,12 @@ O script automaticamente:
 - **Usuário**: piidetector
 - **Diretório**: /home/piidetector/pii-detector
 - **Configuração**: o arquivo `.env` é gerado em `/opt/n-piidetector/.env`
+
+## Variáveis de Ambiente
+
+Algumas configurações podem ser ajustadas no arquivo `.env` gerado durante a instalação.
+
+- `PORT`: porta que o servidor Express utiliza (padrão `5000`)
 
 ## Comandos Úteis
 
@@ -102,3 +109,8 @@ sudo certbot --nginx -d <your-domain>
 - Verificação de malware
 - Headers de segurança
 - Firewall UFW configurado
+
+## OpenAI e Análise Semântica
+
+Para habilitar a etapa opcional de análise semântica, defina a variável de ambiente `OPENAI_API_KEY` com sua chave da OpenAI.
+Caso não esteja configurada, a aplicação exibirá um aviso e continuará apenas com as detecções baseadas em expressões regulares.

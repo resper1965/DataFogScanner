@@ -58,6 +58,8 @@ test_*.txt
 test_*.py
 test_*.js
 *test*
+!tests/
+!tests/**
 detected_data.json
 pdf_*.txt
 
@@ -92,3 +94,9 @@ uv.lock
 
 # Docker
 .docker/
+# Allow test and CI files
+!server/__tests__/
+!server/__tests__/**
+!vitest.config.ts
+!.github/
+!.github/**

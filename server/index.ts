@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { RedisStore } from "connect-redis";
-import { createClient } from "redis";
+import { createClient, type RedisClientType } from "redis";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { sftpMonitor } from "./sftp-monitor";
@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Redis client configuration for sessions (only in production)
-let redisClient: any = null;
+let redisClient: RedisClientType | null = null;
 
 if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
   redisClient = createClient({
@@ -31,7 +31,9 @@ if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
 }
 
 // Session configuration with Redis store for production
-const sessionConfig: any = {
+import type { SessionOptions } from "express-session";
+
+const sessionConfig: SessionOptions = {
   secret: process.env.SESSION_SECRET || 'pii-detector-secret-key-2024',
   resave: false,
   saveUninitialized: false,
@@ -63,7 +65,7 @@ app.use(session(sessionConfig));
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -100,9 +102,11 @@ app.use((req, res, next) => {
     console.warn("SFTP monitor não iniciado:", error);
   }
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    const status = (err as { status?: number; statusCode?: number }).status ||
+      (err as { status?: number; statusCode?: number }).statusCode ||
+      500;
+    const message = err instanceof Error ? err.message : "Internal Server Error";
 
     res.status(status).json({ message });
     throw err;
@@ -117,10 +121,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Serve the app on the configured port
+  // Defaults to 5000 if PORT is not specified
+  const port = parseInt(process.env.PORT || '5000', 10);
   server.listen({
     port,
     host: "0.0.0.0",
