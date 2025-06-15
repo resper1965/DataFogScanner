@@ -132,8 +132,16 @@ export class SemanticClassifier {
       });
 
       const result = JSON.parse(response.choices[0].message.content || '{"detections": []}');
-      
-      return (result.detections || []).map((detection: any) => ({
+
+      interface RawDetection {
+        type?: string;
+        value?: string;
+        context?: string;
+        risk_level?: string;
+        confidence?: number;
+      }
+
+      return (result.detections || []).map((detection: RawDetection) => ({
         type: detection.type || 'UNKNOWN',
         value: detection.value || '',
         context: detection.context || '',
