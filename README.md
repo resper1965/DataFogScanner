@@ -35,6 +35,7 @@ O script automaticamente:
 - Faz build da aplicação
 - Configura systemd e Nginx
 - Inicia todos os serviços
+- Executa `drizzle-kit push` se existirem migrations
 
 ## Acesso
 
@@ -102,3 +103,8 @@ sudo certbot --nginx -d <your-domain>
 - Verificação de malware
 - Headers de segurança
 - Firewall UFW configurado
+
+## OpenAI e Análise Semântica
+
+Para habilitar a etapa opcional de análise semântica, defina a variável de ambiente `OPENAI_API_KEY` com sua chave da OpenAI.
+Caso não esteja configurada, a aplicação exibirá um aviso e continuará apenas com as detecções baseadas em expressões regulares.

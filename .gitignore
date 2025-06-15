@@ -94,3 +94,9 @@ uv.lock
 
 # Docker
 .docker/
+# Allow test and CI files
+!server/__tests__/
+!server/__tests__/**
+!vitest.config.ts
+!.github/
+!.github/**

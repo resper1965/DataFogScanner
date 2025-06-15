@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Save, RotateCcw, Shield, Zap, Database, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { notifications } from "@/components/ui/notification-system";
-import { getBrazilianPatterns, type BrazilianPattern } from "@/lib/brazilian-patterns";
+import { getBrazilianPatterns, type BrazilianPattern } from "@shared/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Detection } from "@shared/schema";
 

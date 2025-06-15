@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { storage } from './storage';
-import { getBrazilianPatterns } from '../client/src/lib/brazilian-patterns';
+import { getBrazilianPatterns } from '@shared/brazilian-patterns';
 import { fileTextExtractor } from './file-text-extractor';
 import { extractZipFiles } from './file-handler';
 
@@ -273,8 +273,8 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
 }
 
 async function runDataFogDetection(
-  filePath: string, 
-  patterns: any, 
+  filePath: string,
+  patterns: string[],
   customRegex?: string
 ): Promise<DetectionResult[]> {
   return new Promise((resolve) => {
@@ -525,8 +525,16 @@ function parseDataFogOutput(output: string): DetectionResult[] {
     }
     
     const results = JSON.parse(jsonContent);
-    
-    return results.map((result: any) => ({
+
+    interface RawResult {
+      type: string;
+      value: string;
+      context: string;
+      position: number;
+      riskLevel: string;
+    }
+
+    return results.map((result: RawResult) => ({
       type: result.type,
       value: result.value,
       context: result.context,
