@@ -1,22 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, RefreshCw, FileText, Archive, FileImage, File } from "lucide-react";
+import type { ProcessingJob, File as UploadedFile } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
+interface ProcessingStats {
+  totalFiles: number;
+  queuedFiles: number;
+  processingFiles: number;
+  completedFiles: number;
+  errorFiles: number;
+}
+
 export default function ProcessingDashboard() {
-  const { data: stats, refetch: refetchStats } = useQuery({
+  const { data: stats, refetch: refetchStats } = useQuery<ProcessingStats>({
     queryKey: ["/api/processing/stats"],
     refetchInterval: 2000, // Refresh every 2 seconds for real-time updates
   });
 
-  const { data: jobs, refetch: refetchJobs } = useQuery({
+  const { data: jobs, refetch: refetchJobs } = useQuery<ProcessingJob[]>({
     queryKey: ["/api/processing/jobs"],
     refetchInterval: 2000,
   });
 
-  const { data: files } = useQuery({
+  const { data: files } = useQuery<UploadedFile[]>({
     queryKey: ["/api/files"],
     refetchInterval: 2000,
   });
@@ -71,7 +80,7 @@ export default function ProcessingDashboard() {
     return "Concluindo análise...";
   };
 
-  const processingFiles = jobs || [];
+  const processingFiles = jobs ?? [];
   const isProcessing = processingFiles.some((job) => job.status === 'processing');
 
   return (
@@ -134,8 +143,8 @@ export default function ProcessingDashboard() {
               Nenhum arquivo em processamento
             </div>
           ) : (
-            processingFiles.map((job: any) => {
-              const file = files?.find((f: any) => f.id === job.fileId);
+            processingFiles.map((job) => {
+              const file = files?.find((f) => f.id === job.fileId);
               if (!file) return null;
 
               return (

@@ -108,22 +108,20 @@ export class DatabaseStorage implements IStorage {
 
   async updateProcessingJobStatus(id: number, status: string, progress?: number, errorMessage?: string): Promise<void> {
     await db.update(processingJobs)
-      .set({ 
-        status, 
+      .set({
+        status,
         progress: progress ?? undefined,
         errorMessage: errorMessage ?? undefined,
-        updatedAt: new Date()
       })
       .where(eq(processingJobs.id, id));
   }
 
   async completeProcessingJob(id: number): Promise<void> {
     await db.update(processingJobs)
-      .set({ 
+      .set({
         status: 'completed',
         progress: 100,
         completedAt: new Date(),
-        updatedAt: new Date()
       })
       .where(eq(processingJobs.id, id));
   }
