@@ -33,7 +33,7 @@ O script automaticamente:
 - Configura usuário `piidetector`
 - Configura banco de dados e sessões Redis
 - Faz build da aplicação
-- Configura PM2 e Nginx
+- Configura systemd e Nginx
 - Inicia todos os serviços
 
 ## Acesso
@@ -47,13 +47,13 @@ O script automaticamente:
 
 ```bash
 # Status da aplicação
-sudo -u piidetector pm2 list
+systemctl status n-piidetector
 
 # Logs da aplicação
-sudo -u piidetector pm2 logs pii-detector
+journalctl -u n-piidetector -f
 
 # Reiniciar aplicação
-sudo -u piidetector pm2 restart pii-detector
+systemctl restart n-piidetector
 
 # Status dos serviços
 systemctl status postgresql redis-server nginx
@@ -75,7 +75,7 @@ systemctl status postgresql redis-server nginx
 - **Backend**: Node.js, Express, TypeScript
 - **Banco**: PostgreSQL com Drizzle ORM
 - **Cache**: Redis para sessões
-- **Deploy**: PM2 + Nginx
+- **Deploy**: systemd + Nginx
 - **Processamento**: Python DataFog + OpenAI
 
 ## Recursos LGPD
