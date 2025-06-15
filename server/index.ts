@@ -1,12 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import connectRedis from "connect-redis";
+import { RedisStore } from "connect-redis";
 import { createClient } from "redis";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { sftpMonitor } from "./sftp-monitor";
 
-const RedisStore = connectRedis(session);
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -19,7 +18,7 @@ if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
     url: process.env.REDIS_URL
   });
 
-  redisClient.on('error', (err) => {
+  redisClient.on('error', (err: Error) => {
     console.error('Redis Client Error:', err);
   });
 

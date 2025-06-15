@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
+import type { Detection, File, Case } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,7 +34,6 @@ import {
 } from "recharts";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { Detection, File, Case } from "@shared/schema";
 
 interface ReportFilters {
   dateFrom?: Date;
@@ -59,8 +59,8 @@ interface DetectionStats {
   byType: { [key: string]: number };
   byDate: { date: string; count: number }[];
   topPatterns: { pattern: string; count: number }[];
-  byOwner: { ownerName: string; count: number; riskLevel: string }[];
-  lgpdCompliance: {
+  byOwner?: { ownerName: string; count: number; riskLevel: string }[];
+  lgpdCompliance?: {
     personalData: number;
     sensitiveData: number;
     childrenData: number;
@@ -121,22 +121,22 @@ export default function ReportsSection() {
   const [dateTo, setDateTo] = useState<Date>();
 
   // Fetch data from dedicated statistics endpoint
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { data: statsData, isLoading: statsLoading } = useQuery<any>({
     queryKey: ["/api/reports/stats"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
-  const { data: detections = [] } = useQuery({
+  const { data: detections = [] } = useQuery<Detection[]>({
     queryKey: ["/api/detections"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
-  const { data: files = [] } = useQuery({
+  const { data: files = [] } = useQuery<File[]>({
     queryKey: ["/api/files"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
-  const { data: cases = [] } = useQuery({
+  const { data: cases = [] } = useQuery<Case[]>({
     queryKey: ["/api/cases"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });

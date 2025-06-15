@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { notifications } from "@/components/ui/notification-system";
 import { getBrazilianPatterns, type BrazilianPattern } from "@/lib/brazilian-patterns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Detection } from "@shared/schema";
 
 interface SystemSettings {
   enableSemanticValidation: boolean;
@@ -28,6 +29,16 @@ interface SystemSettings {
     riskLevel: 'high' | 'medium' | 'low';
     enabled: boolean;
   }>;
+}
+
+interface ReportsStats {
+  totalDetections: number;
+  totalFiles: number;
+  totalCases: number;
+  byRiskLevel: Record<string, number>;
+  byType: Record<string, number>;
+  byDate: Record<string, number>;
+  recentDetections: Detection[];
 }
 
 export default function SettingsSection() {
@@ -50,7 +61,7 @@ export default function SettingsSection() {
   });
 
   // System statistics
-  const { data: statsData } = useQuery({
+  const { data: statsData } = useQuery<ReportsStats>({
     queryKey: ['/api/reports/stats']
   });
 
@@ -180,7 +191,7 @@ export default function SettingsSection() {
         detections,
         files,
         exportDate: new Date().toISOString(),
-        totalDetections: (statsData as any)?.totalDetections || 0
+        totalDetections: statsData?.totalDetections || 0
       };
       
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -478,21 +489,21 @@ export default function SettingsSection() {
                 </Button>
               </div>
 
-              {statsData && (
+              {!!statsData && (
                 <div className="p-4 bg-muted rounded-lg">
                   <h4 className="font-medium mb-2">Estatísticas do Sistema</h4>
                   <div className="grid gap-2 text-sm">
                     <div className="flex justify-between">
                       <span>Total de Detecções:</span>
-                      <span className="font-medium">{(statsData as any)?.totalDetections || 0}</span>
+                      <span className="font-medium">{statsData?.totalDetections || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total de Arquivos:</span>
-                      <span className="font-medium">{(statsData as any)?.totalFiles || 0}</span>
+                      <span className="font-medium">{statsData?.totalFiles || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Total de Casos:</span>
-                      <span className="font-medium">{(statsData as any)?.totalCases || 0}</span>
+                      <span className="font-medium">{statsData?.totalCases || 0}</span>
                     </div>
                   </div>
                 </div>

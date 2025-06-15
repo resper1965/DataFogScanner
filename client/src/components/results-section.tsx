@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { Detection, File } from "@shared/schema";
 import { AlertTriangle, PieChart, Download, ExternalLink, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,18 +12,30 @@ import autoTable from 'jspdf-autotable';
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+interface ProcessingStats {
+  totalFiles: number;
+  queuedFiles: number;
+  processingFiles: number;
+  completedFiles: number;
+  errorFiles: number;
+  totalDetections: number;
+  highRiskDetections: number;
+  mediumRiskDetections: number;
+  lowRiskDetections: number;
+}
+
 export default function ResultsSection() {
-  const { data: detections = [] } = useQuery({
+  const { data: detections = [] } = useQuery<Detection[]>({
     queryKey: ["/api/detections"],
     refetchInterval: 2000,
   });
 
-  const { data: stats = {} } = useQuery({
+  const { data: stats = {} as ProcessingStats } = useQuery<ProcessingStats>({
     queryKey: ["/api/processing/stats"],
     refetchInterval: 2000,
   });
 
-  const { data: files = [] } = useQuery({
+  const { data: files = [] } = useQuery<File[]>({
     queryKey: ["/api/files"],
     refetchInterval: 2000,
   });
@@ -73,12 +86,12 @@ export default function ResultsSection() {
       yPos += 15;
       
       // Tabela de detecções
-      const tableData = recentDetections.slice(0, 20).map((detection: any) => [
+      const tableData = recentDetections.slice(0, 20).map((detection) => [
         format(new Date(detection.createdAt || ''), 'dd/MM/yyyy'),
         detection.type,
         detection.value.length > 20 ? detection.value.substring(0, 20) + '...' : detection.value,
         detection.ownerName || 'Não identificado',
-        getRiskLevelText(detection.riskLevel),
+        getRiskLevelText(detection.riskLevel as 'high' | 'medium' | 'low'),
         detection.context && detection.context.length > 25 
           ? detection.context.substring(0, 25) + '...' 
           : detection.context || ''
@@ -122,15 +135,15 @@ export default function ResultsSection() {
   const totalDetections = detections.length;
   
   // Calculate risk counts from actual detections
-  const highRiskCount = detections.filter((d: any) => d.riskLevel === 'high').length;
-  const mediumRiskCount = detections.filter((d: any) => d.riskLevel === 'medium').length;
-  const lowRiskCount = detections.filter((d: any) => d.riskLevel === 'low').length;
+  const highRiskCount = detections.filter((d) => d.riskLevel === 'high').length;
+  const mediumRiskCount = detections.filter((d) => d.riskLevel === 'medium').length;
+  const lowRiskCount = detections.filter((d) => d.riskLevel === 'low').length;
 
   const documentTypes = [
-    { name: 'PDF', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.pdf')).length, icon: 'fa-file-pdf', color: 'text-red-500' },
-    { name: 'DOC', count: files.filter((f: any) => f.originalName?.toLowerCase().match(/\.(doc|docx)$/)).length, icon: 'fa-file-word', color: 'text-blue-500' },
-    { name: 'ZIP', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.zip')).length, icon: 'fa-file-archive', color: 'text-yellow-500' },
-    { name: 'TXT', count: files.filter((f: any) => f.originalName?.toLowerCase().endsWith('.txt')).length, icon: 'fa-file-alt', color: 'text-gray-500' },
+    { name: 'PDF', count: files.filter((f) => f.originalName?.toLowerCase().endsWith('.pdf')).length, icon: 'fa-file-pdf', color: 'text-red-500' },
+    { name: 'DOC', count: files.filter((f) => f.originalName?.toLowerCase().match(/\.(doc|docx)$/)).length, icon: 'fa-file-word', color: 'text-blue-500' },
+    { name: 'ZIP', count: files.filter((f) => f.originalName?.toLowerCase().endsWith('.zip')).length, icon: 'fa-file-archive', color: 'text-yellow-500' },
+    { name: 'TXT', count: files.filter((f) => f.originalName?.toLowerCase().endsWith('.txt')).length, icon: 'fa-file-alt', color: 'text-gray-500' },
   ];
 
   return (
@@ -149,10 +162,14 @@ export default function ResultsSection() {
               Nenhuma detecção encontrada
             </div>
           ) : (
-            recentDetections.map((detection: any) => {
-              const file = files?.find((f: any) => f.id === detection.fileId);
-              const riskColorClass = getRiskLevelColor(detection.riskLevel);
-              const badgeColorClass = getRiskLevelBadgeColor(detection.riskLevel);
+            recentDetections.map((detection) => {
+              const file = files?.find((f) => f.id === detection.fileId);
+              const riskColorClass = getRiskLevelColor(
+                detection.riskLevel as 'high' | 'medium' | 'low'
+              );
+              const badgeColorClass = getRiskLevelBadgeColor(
+                detection.riskLevel as 'high' | 'medium' | 'low'
+              );
               
               return (
                 <div key={detection.id} className={`border-l-4 p-4 rounded-r-lg ${riskColorClass}`}>
@@ -171,7 +188,7 @@ export default function ResultsSection() {
                       )}
                     </div>
                     <Badge className={`ml-2 ${badgeColorClass}`}>
-                      {getRiskLevelText(detection.riskLevel)}
+                      {getRiskLevelText(detection.riskLevel as 'high' | 'medium' | 'low')}
                     </Badge>
                   </div>
                 </div>

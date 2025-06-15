@@ -123,10 +123,12 @@ export class MemStorage implements IStorage {
 
   async createDetection(insertDetection: InsertDetection): Promise<Detection> {
     const id = this.currentDetectionId++;
-    const detection: Detection = { 
+    const detection: Detection = {
       ...insertDetection,
       context: insertDetection.context || null,
       position: insertDetection.position || null,
+      ownerName: insertDetection.ownerName || null,
+      documentType: insertDetection.documentType || null,
       id,
       createdAt: new Date()
     };
