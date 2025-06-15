@@ -35,6 +35,7 @@ O script automaticamente:
 - Faz build da aplicação
 - Configura systemd e Nginx
 - Inicia todos os serviços
+- Executa `drizzle-kit push` se existirem migrations
 
 ## Acesso
 

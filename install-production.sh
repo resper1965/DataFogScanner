@@ -214,9 +214,12 @@ log "✓ Build concluído"
 # ============================================================================
 log "Aplicando migrations do banco de dados..."
 
-sudo -u piidetector bash -c "cd /opt/n-piidetector && npm run db:push"
-
-log "✓ Migrations aplicadas"
+if [ -d /opt/n-piidetector/migrations ] && ls /opt/n-piidetector/migrations/*.sql >/dev/null 2>&1; then
+    sudo -u piidetector bash -c "cd /opt/n-piidetector && npm run db:push"
+    log "✓ Migrations aplicadas"
+else
+    log "Nenhuma migration encontrada - pulando db:push"
+fi
 
 # ============================================================================
 # 11. CONFIGURAÇÃO DO SYSTEMD
