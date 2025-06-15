@@ -20,6 +20,8 @@ sudo ./install-production.sh
 
 > **Nota**: o Node.js instalado pelo script já inclui o `npm`. Não instale o `npm` separadamente com `apt` para evitar conflitos.
 
+Após a instalação, execute `./enable-https.sh` para finalizar a configuração de HTTPS. O script utiliza o domínio definido em `/opt/n-piidetector/.env` e gera automaticamente o certificado TLS com o Certbot.
+
 ## Características Principais
 
 - **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
@@ -68,11 +70,12 @@ systemctl status postgresql redis-server nginx
 
 ## Habilitar HTTPS
 
-Para gerar um certificado TLS gratuito para o domínio configurado (`monster.e-ness.com.br`) utilizando o Nginx, instale o Certbot e execute a emissão:
+Execute o script `enable-https.sh` para gerar automaticamente o certificado TLS e aplicar as regras de rate limit no Nginx:
 
 ```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d <your-domain>
+sudo ./enable-https.sh              # usa o domínio do arquivo .env
+# ou especifique manualmente
+sudo ./enable-https.sh exemplo.com
 ```
 
 ## Estrutura do Projeto
