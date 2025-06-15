@@ -137,13 +137,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadedFiles.push(savedFile);
       }
 
-      res.json({ 
+  res.json({
         message: "Arquivos enviados com sucesso",
-        files: uploadedFiles 
+        files: uploadedFiles
       });
     } catch (error) {
       console.error("Erro no upload:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Extract zip files endpoint
+  app.post("/api/files/extract", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Nenhum arquivo foi enviado" });
+      }
+
+      const extracted = await extractZipFiles(req.file.path);
+
+      const files = extracted.map(file => ({ name: path.basename(file) }));
+
+      res.json({ files });
+    } catch (error) {
+      console.error("Erro na extração:", error);
+      res.status(500).json({ message: "Erro ao extrair arquivo" });
     }
   });
 
