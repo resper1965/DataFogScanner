@@ -252,8 +252,8 @@ async function runBrazilianDataDetection(text: string, fileId: number): Promise<
 }
 
 async function runDataFogDetection(
-  filePath: string, 
-  patterns: any, 
+  filePath: string,
+  patterns: string[],
   customRegex?: string
 ): Promise<DetectionResult[]> {
   return new Promise((resolve) => {
@@ -504,8 +504,16 @@ function parseDataFogOutput(output: string): DetectionResult[] {
     }
     
     const results = JSON.parse(jsonContent);
-    
-    return results.map((result: any) => ({
+
+    interface RawResult {
+      type: string;
+      value: string;
+      context: string;
+      position: number;
+      riskLevel: string;
+    }
+
+    return results.map((result: RawResult) => ({
       type: result.type,
       value: result.value,
       context: result.context,

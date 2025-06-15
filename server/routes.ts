@@ -434,8 +434,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const cases = await storage.getCases();
       res.json(cases);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -454,8 +454,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newCase = await storage.createCase(result.data);
       res.status(201).json(newCase);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -467,8 +467,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Case not found" });
       }
       res.json(case_);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -490,8 +490,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateCase(id, result.data);
       const updatedCase = await storage.getCase(id);
       res.json(updatedCase);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
   });
 
