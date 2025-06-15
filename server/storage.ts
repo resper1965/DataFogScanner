@@ -6,7 +6,6 @@ import {
   type Case, type InsertCase,
   type ProcessingJob, type InsertProcessingJob
 } from "@shared/schema";
-import { DatabaseStorage } from "./db-storage";
 
 export interface IStorage {
   // Users
@@ -266,4 +265,10 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export let storage: IStorage;
+if (process.env.NODE_ENV === 'test') {
+  storage = new MemStorage();
+} else {
+  const { DatabaseStorage } = await import('./db-storage.js');
+  storage = new DatabaseStorage();
+}
