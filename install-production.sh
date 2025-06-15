@@ -78,8 +78,14 @@ npm install -g tsx 2>/dev/null
 
 # Python dependencies
 info "Instalando dependências Python..."
-pip3 install --break-system-packages datafog PyPDF2 python-docx openpyxl pandas regex 2>/dev/null || \
-pip3 install datafog PyPDF2 python-docx openpyxl pandas regex 2>/dev/null
+if dpkg -s python3-typing-extensions >/dev/null 2>&1; then
+    warn "Removendo pacote python3-typing-extensions..."
+    apt remove -y python3-typing-extensions >/dev/null 2>&1 || true
+fi
+pip3 install --break-system-packages --ignore-installed typing_extensions \
+    datafog PyPDF2 python-docx openpyxl pandas regex 2>/dev/null || \
+pip3 install --ignore-installed typing_extensions \
+    datafog PyPDF2 python-docx openpyxl pandas regex 2>/dev/null
 
 log "✓ Dependências instaladas - Node: $(node -v) | NPM: $(npm -v)"
 
