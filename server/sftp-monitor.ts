@@ -4,6 +4,7 @@ import path from "path";
 import { storage } from "./storage";
 import { processFiles } from "./datafog-processor";
 import { securityScanner } from "./security-scanner";
+import pLimit from "p-limit";
 
 const SFTP_INCOMING_DIR = "./uploads/sftp/incoming";
 const SFTP_PROCESSING_DIR = "./uploads/sftp/processing";
@@ -11,6 +12,7 @@ const SFTP_PROCESSED_DIR = "./uploads/sftp/processed";
 
 class SFTPMonitor {
   private isMonitoring = false;
+  private processingLimit = pLimit(3);
 
   async start() {
     if (this.isMonitoring) return;
@@ -47,7 +49,7 @@ class SFTPMonitor {
         if (eventType === 'rename' && filename) {
           // New file detected
           setTimeout(() => {
-            this.processNewFile(path.join(SFTP_INCOMING_DIR, filename));
+            this.queueProcessing(path.join(SFTP_INCOMING_DIR, filename));
           }, 1000); // Wait 1 second to ensure file is fully written
         }
       });
@@ -57,14 +59,19 @@ class SFTPMonitor {
     }
   }
 
+  private queueProcessing(filePath: string): Promise<void> {
+    return this.processingLimit(() => this.processNewFile(filePath)).catch((error) => {
+      console.error(`Erro na fila de processamento: ${error}`);
+    });
+  }
+
   private async processExistingFiles() {
     try {
       const files = await readdir(SFTP_INCOMING_DIR);
-      
-      for (const file of files) {
-        const fullPath = path.join(SFTP_INCOMING_DIR, file);
-        await this.processNewFile(fullPath);
-      }
+
+      await Promise.all(files.map(file =>
+        this.queueProcessing(path.join(SFTP_INCOMING_DIR, file))
+      ));
     } catch (error) {
       console.warn("Erro ao processar arquivos existentes:", error);
     }
