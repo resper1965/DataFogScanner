@@ -111,7 +111,8 @@
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
     "vite": "^5.4.14",
-    "vitest": "^1.5.0"
+    "vitest": "^1.5.0",
+    "adm-zip": "^0.5.16"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
