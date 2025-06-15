@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertFileSchema, insertProcessingJobSchema, insertDetectionSchema, insertCaseSchema } from "@shared/schema";
+import { quoteCsvField } from "@shared/csv";
 import { authenticateUser, registerUser, loginSchema, registerSchema } from "./auth";
 import multer from "multer";
 import path from "path";
@@ -401,20 +402,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const files = await storage.getFiles();
       
       // CSV header
-      let csvContent = "ID,Tipo,Valor,Arquivo,Nível de Risco,Contexto,Posição,Data de Criação\n";
-      
+      let csvContent = 'ID,Tipo,Valor,Arquivo,Nível de Risco,Contexto,Posição,Data de Criação\n';
+
       // CSV data
       detections.forEach(d => {
         const file = files.find(f => f.id === d.fileId);
         const csvRow = [
-          d.id,
-          d.type,
-          `"${d.value}"`,
-          `"${file?.originalName || 'Desconhecido'}"`,
-          d.riskLevel,
-          `"${d.context || ''}"`,
-          d.position || '',
-          d.createdAt ? new Date(d.createdAt).toISOString() : ''
+          quoteCsvField(d.id),
+          quoteCsvField(d.type),
+          quoteCsvField(d.value),
+          quoteCsvField(file?.originalName || 'Desconhecido'),
+          quoteCsvField(d.riskLevel),
+          quoteCsvField(d.context || ''),
+          quoteCsvField(d.position || ''),
+          quoteCsvField(d.createdAt ? new Date(d.createdAt).toISOString() : '')
         ].join(',');
         csvContent += csvRow + '\n';
       });

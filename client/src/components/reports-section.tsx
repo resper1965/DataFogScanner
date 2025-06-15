@@ -14,6 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { quoteCsvField } from "@shared/csv";
 import { cn } from "@/lib/utils";
 import {
   BarChart,
@@ -248,7 +249,7 @@ export default function ReportsSection() {
     const headers = Object.keys(csvData[0] || {});
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+      ...csvData.map(row => headers.map(header => quoteCsvField(row[header as keyof typeof row])).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
