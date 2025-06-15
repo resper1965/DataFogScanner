@@ -58,6 +58,8 @@ test_*.txt
 test_*.py
 test_*.js
 *test*
+!tests/
+!tests/**
 detected_data.json
 pdf_*.txt
 

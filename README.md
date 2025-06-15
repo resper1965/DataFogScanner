@@ -25,7 +25,7 @@ sudo ./install-production.sh
 - **Detecção Avançada**: CPF, CNPJ, RG, CEP, telefones, emails
 - **Interface Moderna**: React com tema escuro/claro
 - **LGPD Compliance**: Relatórios automáticos de conformidade
-- **Processamento**: PDF, DOC/DOCX, XLS/XLSX, TXT, CSV, XML
+- **Processamento**: PDF, DOC/DOCX, XLS/XLSX, TXT, CSV, XML, ZIP
 - **Arquitetura**: Node.js + PostgreSQL + Redis + Nginx
 
 O script automaticamente:
