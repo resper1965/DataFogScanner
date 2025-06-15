@@ -59,6 +59,15 @@ sudo -u piidetector pm2 restart pii-detector
 systemctl status postgresql redis-server nginx
 ```
 
+## Habilitar HTTPS
+
+Para gerar um certificado TLS gratuito para o domínio configurado (`monster.e-ness.com.br`) utilizando o Nginx, instale o Certbot e execute a emissão:
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d <your-domain>
+```
+
 ## Estrutura do Projeto
 
 ```
